@@ -1,0 +1,386 @@
+<DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Josi Doces Gourmet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fff0f3; color: #444; }
+        header { 
+            background: linear-gradient(135deg, #ff4d6d, #ff8fa3); 
+            color: white; text-align: center; padding: 40px 20px;
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+        }
+        .logo-container {
+            width: 130px; height: 130px; background: white; border-radius: 50%;
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
+            border: 5px solid #ffccd5; box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        .logo-content { text-align: center; color: #ff4d6d; line-height: 1.1; }
+        .logo-content .name-josi { font-size: 24px; font-weight: bold; font-family: 'Georgia', serif; display: block; }
+        .logo-content .name-doces { font-size: 16px; text-transform: uppercase; letter-spacing: 1px; display: block; border-top: 1px solid #ffccd5; margin-top: 2px; padding-top: 2px; }
+        .logo-content .name-gourmet { font-size: 10px; font-weight: bold; color: #ff8fa3; display: block; }
+
+        .container { padding: 20px; max-width: 500px; margin: auto; padding-bottom: 300px; } 
+        label { display: block; margin-top: 20px; font-weight: bold; color: #ff4d6d; font-size: 15px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: 1px solid #ffccd5; box-sizing: border-box; background: white; font-size: 16px; }
+        .card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ffe5ec; }
+        .price { color: #ff4d6d; font-weight: bold; font-size: 1.3em; margin: 10px 0; }
+        button { color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; font-size: 16px; }
+        
+        .btn-add { background: #25D366; }
+        .btn-finalizar { background: #25D366; padding: 10px; font-size: 14px; } 
+        .btn-pix { background: #00b4d8; padding: 10px; font-size: 14px; }
+        .btn-copy-total { background: #5a189a; margin-bottom: 5px; padding: 10px; font-size: 14px; }
+        .btn-mp { background: #009ee3; padding: 10px; font-size: 14px; }
+        
+        #secaoDadosPedido { display: none; margin-top: 30px; border-top: 2px dashed #ffccd5; padding-top: 10px; }
+
+        #carrinhoBox { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: white; padding: 12px 20px; 
+            border-radius: 20px 20px 0 0; 
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1); 
+            z-index: 1000; max-height: 70vh; 
+            overflow-y: auto; text-align: center; 
+            display: none; 
+        }
+        #pixDisplay { display: none; background: #fff9fa; padding: 10px; border-radius: 12px; margin-top: 10px; border: 2px dashed #ff4d6d; }
+        
+        .item-carrinho { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #fef0f3; font-size: 14px; }
+        .detalhe-extra { display: flex; justify-content: space-between; padding: 2px 0; font-size: 12px; color: #666; font-style: italic; }
+        .remover { color: #ff4d6d; font-weight: bold; cursor: pointer; padding-left: 10px; }
+        #blocoEndereco { display: none; }
+        .total-destaque { color: #ff4d6d; font-size: 1.1em; margin-top: 2px; }
+        #resumo { margin-top: 5px; font-size: 15px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <div class="logo-content">
+            <span class="name-josi">Josi</span>
+            <span class="name-doces">Doces</span>
+            <span class="name-gourmet">GOURMET</span>
+        </div>
+    </div>
+    <h1>🍬 Josi Doces Gourmet</h1>
+    <p>Escolha suas doçuras abaixo!</p>
+</header>
+
+<div class="container">
+    <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p><button class="btn-add" onclick="add('Torta de Bolacha', 55)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Torta de Bolacha no Pote (P)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (P)', 10)">Adicionar ao Carrinho</button></div>
+    
+    <div class="card"><h3>Torta de Bolacha no Pote (G)</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (G)', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Bolo de Chocolate no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Chocolate no Pote', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Bolo no Pote com Pudim</h3><p class="price">R$ 14,00</p><button class="btn-add" onclick="add('Bolo no Potw com Pudim', 14)">Adicionar ao Carrinho</button></div>
+    
+    <div class="card"><h3>Bolo de Stikadinho no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo deStikadinho no Pote', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Bolo de Cenoura no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Cenoura no Pote', 12)">Adicionar ao Carrinho</button></div>
+
+    <div id="secaoDadosPedido">
+        <label>👤 Seus Dados</label>
+        <input type="text" id="nome" placeholder="Seu Nome Completo" oninput="salvarDados()">
+        <input type="tel" id="telefone" placeholder="(00) 00000-0000" maxlength="15" oninput="mascaraTelefone(this); salvarDados();">
+        
+        <label>🚚 Entrega e Região</label>
+        <select id="bairro" onchange="alternarEndereco(); salvarDados();">
+            <option value="0">Vou retirar no local (R$ 0,00)</option>
+            <option value="8">Centro (R$ 8,00)</option>
+            <option value="12">Acesso Dona Leopoldina / Parque (R$ 12,00)</option>
+            <option value="12">Cidade Nova (R$ 12,00)</option>
+            <option value="8">Cruzeiro (R$ 8,00)</option>
+            <option value="15">Gressler (R$ 15,00)</option>
+            <option value="30">Interior / Outros (R$ 30,00)</option>
+            <option value="5">Coronel Brito (R$ 5,00)</option>
+            <option value="15">Santa Tecla (R$ 15,00)</option>
+        </select>
+
+        <div id="blocoEndereco">
+            <label>📍 Endereço de Entrega</label>
+            <textarea id="endereco" placeholder="Rua, número e referência" oninput="salvarDados()"></textarea>
+        </div>
+
+        <label>⏰ Agendamento (08:00 às 17:00)</label>
+        <div style="display:flex; gap:5px;">
+            <input type="date" id="dataAgendamento" onchange="verificarPgto(); salvarDados();">
+            <input type="time" id="horaAgendamento" onchange="verificarPgto(); salvarDados();">
+        </div>
+
+        <label>💳 Forma de Pagamento</label>
+        <select id="pagamento" onchange="verificarPgto(); salvarDados();">
+            <option value="Pix">Pix</option>
+            <option value="Cartao_Credito">Cartão de Crédito</option>
+            <option value="Cartao_Debito">Cartão de Debito</option>
+        </select>
+    </div>
+</div>
+
+<div id="carrinhoBox">
+    <div id="itensCarrinhoLista"></div>
+    <div id="detalhesCarrinhoLista"></div>
+    <div id="resumo"><b>Total: R$ 0,00</b></div>
+    
+    <button id="btnCopiarValor" onclick="copiarValorNumerico()" class="btn-copy-total" style="display:none;">📋 1º Copiar Valor Total</button>
+    <button id="btnPagarMP" onclick="abrirMercadoPago()" class="btn-mp" style="display:none;">💳 2º Pagar no Cartão</button>
+    <button id="btnGerarPix" onclick="gerarPixReal()" class="btn-pix" style="display:none;">💎 1º Gerar PIX Copia e Cola</button>
+    
+    <button id="btnWhatsapp" onclick="finalizarZap()" class="btn-finalizar">✅ Enviar Pedido ao WhatsApp</button>
+    
+    <div id="pixDisplay">
+        <div id="qrcode" style="display: flex; justify-content: center;"></div>
+        <textarea id="brcode" readonly style="font-size: 10px; height: 50px; margin: 10px 0; background: #f0f0f0; border: 1px solid #ccc; width: 100%;"></textarea>
+        <button onclick="copiarPix()" style="background:#444; padding: 8px; font-size: 12px;">Copiar Código Pix</button>
+    </div>
+</div>
+
+<script>
+let carrinho = [];
+let pixGerado = false;
+const CHAVE_PIX = "00431179026"; 
+const NOME_RECEBEDOR = "JOSI DOCES";
+const CIDADE_RECEBEDOR = "VENANCIO AIRES";
+
+const campoData = document.getElementById('dataAgendamento');
+const campoHora = document.getElementById('horaAgendamento');
+
+function mascaraTelefone(i) {
+    let v = i.value.replace(/\D/g, "");
+    v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+    v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+    i.value = v;
+}
+
+function salvarDados() {
+    const dados = {
+        nome: document.getElementById("nome").value,
+        telefone: document.getElementById("telefone").value,
+        bairro: document.getElementById("bairro").value,
+        endereco: document.getElementById("endereco").value,
+        data: campoData.value,
+        hora: campoHora.value,
+        pagamento: document.getElementById("pagamento").value,
+        carrinho: carrinho
+    };
+    localStorage.setItem('pedidoJosiDoces', JSON.stringify(dados));
+}
+
+function carregarDados() {
+    const salvo = localStorage.getItem('pedidoJosiDoces');
+    if (salvo) {
+        const d = JSON.parse(salvo);
+        document.getElementById("nome").value = d.nome || "";
+        document.getElementById("telefone").value = d.telefone || "";
+        document.getElementById("bairro").value = d.bairro || "0";
+        document.getElementById("endereco").value = d.endereco || "";
+        document.getElementById("pagamento").value = d.pagamento || "Pix";
+        carrinho = d.carrinho || [];
+        
+        const hoje = new Date().toISOString().split("T")[0];
+        campoData.value = (d.data >= hoje) ? d.data : hoje;
+        campoHora.value = d.hora || "";
+
+        alternarEndereco();
+        verificarPgto();
+    } else {
+        const agora = new Date();
+        campoData.value = agora.toISOString().split("T")[0];
+        let horaSugestao = new Date(agora.getTime() + (2 * 60 * 60 * 1000));
+        let hh = String(horaSugestao.getHours()).padStart(2, '0');
+        let mm = String(horaSugestao.getMinutes()).padStart(2, '0');
+        campoHora.value = `${Math.max(8, Math.min(17, hh))}:${mm}`;
+    }
+    campoData.min = new Date().toISOString().split("T")[0];
+}
+
+function validarTudo() {
+    const nome = document.getElementById("nome").value.trim();
+    const telRaw = document.getElementById("telefone").value.replace(/\D/g, "");
+    const bairroSel = document.getElementById("bairro");
+    const endereco = document.getElementById("endereco").value.trim();
+    const data = campoData.value;
+    const hora = campoHora.value;
+    const agora = new Date();
+
+    if (!nome) { alert("⚠️ Informe seu nome."); return false; }
+    if (telRaw.length !== 11 || telRaw[2] !== "9") { 
+        alert("⚠️ Por favor, informe um WhatsApp válido com DDD e o 9 na frente."); 
+        return false; 
+    }
+
+    if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
+    if (bairroSel.value !== "0" && !endereco) { alert("⚠️ Informe o endereço de entrega."); return false; }
+    if (!data) { alert("⚠️ Escolha a data."); return false; }
+    if (!hora) { alert("⚠️ Escolha o horário."); return false; }
+
+    const [ano, mes, dia] = data.split('-');
+    const [h, m] = hora.split(':');
+    const dataAgendada = new Date(ano, mes - 1, dia, h, m);
+    
+    const diaSemana = dataAgendada.getDay();
+    const ehFinalDeSemana = (diaSemana === 0 || diaSemana === 6);
+    const feriados = ['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '12-25'];
+    const ehFeriado = feriados.includes(`${mes}-${dia}`);
+
+    if (ehFinalDeSemana || ehFeriado) {
+        const limite2h = new Date(agora.getTime() + (2 * 60 * 60 * 1000));
+        if (dataAgendada < limite2h) {
+            alert("⚠️ Sábados, domingos e feriados: mínimo 2 horas de antecedência.");
+            return false;
+        }
+    } else {
+        const limite24h = new Date(agora.getTime() + (24 * 60 * 60 * 1000));
+        if (dataAgendada < limite24h) {
+            alert("⚠️ Pedidos de segunda a sexta: mínimo de 1 dia (24h) de antecedência.");
+            return false;
+        }
+    }
+
+    if (hora < "08:00" || hora > "17:00") { 
+        alert("⚠️ Atendimento das 08:00 às 17:00."); 
+        return false; 
+    }
+
+    return true;
+}
+
+function atualizar() {
+    const secaoDados = document.getElementById("secaoDadosPedido");
+    const carrinhoBox = document.getElementById("carrinhoBox");
+    
+    if (carrinho.length > 0) {
+        secaoDados.style.display = "block";
+        carrinhoBox.style.display = "block";
+    } else {
+        secaoDados.style.display = "none";
+        carrinhoBox.style.display = "none";
+    }
+
+    const listaDiv = document.getElementById("itensCarrinhoLista");
+    const detalhesDiv = document.getElementById("detalhesCarrinhoLista");
+    listaDiv.innerHTML = ""; detalhesDiv.innerHTML = "";
+    let subtotal = 0;
+    
+    carrinho.forEach((item, index) => {
+        subtotal += item.preco;
+        listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.nome}</span> <span>R$ ${item.preco.toFixed(2)} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
+    });
+
+    const bairroSel = document.getElementById("bairro");
+    const frete = parseFloat(bairroSel.value);
+    const dataF = campoData.value.split('-').reverse().join('/');
+    const hora = campoHora.value;
+
+    detalhesDiv.innerHTML += `<div class="detalhe-extra"><span>Subtotal</span> <span>R$ ${subtotal.toFixed(2)}</span></div>`;
+    detalhesDiv.innerHTML += `<div class="detalhe-extra"><span>Frete</span> <span>R$ ${frete.toFixed(2)}</span></div>`;
+    if(hora) detalhesDiv.innerHTML += `<div class="detalhe-extra"><span>Agendado para:</span> <span>${dataF} às ${hora}</span></div>`;
+    
+    let total = subtotal + frete;
+    document.getElementById("resumo").innerHTML = `<b>TOTAL: <span class="total-destaque">R$ ${total.toFixed(2).replace('.', ',')}</span></b>`;
+    return total;
+}
+
+function verificarPgto() {
+    const pag = document.getElementById("pagamento").value;
+    const btnPix = document.getElementById("btnGerarPix");
+    const btnCopy = document.getElementById("btnCopiarValor");
+    const btnMP = document.getElementById("btnPagarMP");
+    const btnZap = document.getElementById("btnWhatsapp");
+
+    btnPix.style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
+    btnCopy.style.display = (pag.includes("Cartao")) ? "block" : "none";
+    btnMP.style.display = (pag.includes("Cartao")) ? "block" : "none";
+    
+    btnZap.innerText = pag.includes("Cartao") ? "✅ 3º Enviar Pedido ao WhatsApp" : "✅ Enviar Pedido ao WhatsApp";
+    
+    atualizar();
+}
+
+function abrirMercadoPago() {
+    if (!validarTudo()) return;
+    salvarDados();
+    window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank");
+}
+
+function gerarPixReal() {
+    if (!validarTudo()) return;
+    const valor = atualizar().toFixed(2);
+    const conta = fv("00", "BR.GOV.BCB.PIX") + fv("01", CHAVE_PIX);
+    let payload = fv("00", "01") + fv("26", conta) + fv("52", "0000") + fv("53", "986") + fv("54", valor) + fv("58", "BR") + fv("59", NOME_RECEBEDOR) + fv("60", CIDADE_RECEBEDOR) + fv("62", fv("05", "***")) + "6304";
+    const res = payload + crc16(payload);
+    pixGerado = true;
+    document.getElementById("pixDisplay").style.display = "block";
+    document.getElementById("brcode").value = res;
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), { text: res, width: 120, height: 120 });
+    document.getElementById("btnGerarPix").style.display = "none";
+}
+
+function finalizarZap() {
+    if (!validarTudo()) return;
+    const pag = document.getElementById("pagamento").value;
+    if (pag === "Pix" && !pixGerado) { alert("⚠️ Gere o Pix antes de enviar!"); return; }
+
+    const nome = document.getElementById("nome").value;
+    const tel = document.getElementById("telefone").value;
+    const bairroText = document.getElementById("bairro").options[document.getElementById("bairro").selectedIndex].text;
+    const endereco = document.getElementById("endereco").value;
+    const dataF = campoData.value.split('-').reverse().join('/');
+    const hora = campoHora.value;
+    
+    let itensMsg = "";
+    carrinho.forEach(i => {
+        itensMsg += `- ${i.nome} (R$ ${i.preco.toFixed(2).replace('.', ',')})\n`;
+    });
+
+    let msg = `*NOVO PEDIDO - JOSI DOCES*\n\n`;
+    msg += `👤 *Cliente:* ${nome}\n`;
+    msg += `📱 *WhatsApp:* ${tel}\n`;
+    msg += `📍 *Região:* ${bairroText}\n`;
+    if(endereco) msg += `🏠 *Endereço:* ${endereco}\n`;
+    msg += `📅 *Entrega/Retirada:* ${dataF} às ${hora}\n`;
+    msg += `💳 *Pagamento:* ${pag}\n\n`;
+    msg += `🛒 *ÍTENS:* \n${itensMsg}\n`;
+    msg += `⭐ *TOTAL: R$ ${atualizar().toFixed(2).replace('.', ',')}*`;
+
+    window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
+}
+
+function add(n, p) { 
+    carrinho.push({nome: n, preco: p}); 
+    resetPixStatus(); 
+    salvarDados(); 
+}
+function remover(index) { 
+    carrinho.splice(index, 1); 
+    resetPixStatus(); 
+    salvarDados(); 
+}
+function resetPixStatus() { pixGerado = false; document.getElementById("pixDisplay").style.display = "none"; verificarPgto(); }
+function copiarValorNumerico() { navigator.clipboard.writeText(atualizar().toFixed(2)); alert("✅ Valor copiado!"); }
+function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("✅ Pix Copiado!"); }
+function fv(id, v) { return id + v.length.toString().padStart(2, '0') + v; }
+function crc16(data) {
+    let crc = 0xFFFF;
+    for (let i = 0; i < data.length; i++) {
+        crc ^= data.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+            if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021; else crc <<= 1;
+        }
+    }
+    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
+function alternarEndereco() {
+    document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "0") ? "none" : "block";
+    resetPixStatus();
+}
+
+window.onload = carregarDados;
+</script>
+</body>
+</html>
