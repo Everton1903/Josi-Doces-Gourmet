@@ -23,6 +23,7 @@
         .logo-content .name-josi { font-size: 24px; font-weight: bold; font-family: 'Georgia', serif; display: block; }
         .logo-content .name-doces { font-size: 16px; text-transform: uppercase; letter-spacing: 1px; display: block; border-top: 1px solid #ffccd5; margin-top: 2px; padding-top: 2px; }
         .logo-content .name-gourmet { font-size: 10px; font-weight: bold; color: #ff8fa3; display: block; }
+        .logo-content .name-contato { font-size: 9px; font-weight: bold; color: #ff4d6d; display: block; margin-top: 2px; }
 
         .container { padding: 20px; max-width: 500px; margin: auto; padding-bottom: 350px; } 
         label { display: block; margin-top: 20px; font-weight: bold; color: #ff4d6d; font-size: 15px; }
@@ -39,12 +40,11 @@
         
         #secaoDadosPedido { display: none; margin-top: 30px; border-top: 2px dashed #ffccd5; padding-top: 10px; }
 
-        /* AJUSTE DO CARRINHO PARA NÃO FICAR EM CIMA */
         #carrinhoBox { 
             position: fixed; 
             bottom: 10px; 
             right: 10px; 
-            left: 50px; /* Deixa um espaço na esquerda para clicar nos campos */
+            left: 50px; 
             background: white; 
             padding: 15px; 
             border-radius: 20px; 
@@ -82,9 +82,57 @@
         #blocoEndereco { display: none; }
         .total-destaque { color: #ff4d6d; font-size: 1.1em; margin-top: 2px; }
         #resumo { margin-top: 5px; font-size: 15px; text-align: center; }
+
+        /* Estilos do Modal de Aviso */
+        .modal-aviso {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+        }
+        .modal-conteudo {
+            background-color: white;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 25px;
+            width: 85%;
+            max-width: 400px;
+            text-align: center;
+            border: 3px solid #ff4d6d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: bounceIn 0.5s ease;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-conteudo h2 { color: #ff4d6d; margin-top: 0; font-size: 22px; }
+        .modal-conteudo p { font-size: 15px; margin-bottom: 15px; }
+        .modal-conteudo ul { text-align: left; font-size: 14px; color: #555; margin-bottom: 20px; padding-left: 20px; }
+        .btn-entendi { background: #ff4d6d; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        .btn-duvida { background: #25D366; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; text-decoration: none; display: block; box-sizing: border-box; }
     </style>
 </head>
 <body>
+
+<div id="modalAviso" class="modal-aviso">
+    <div class="modal-conteudo">
+        <h2>⚠️ Regras de Agendamento</h2>
+        <p>Por favor, atente-se aos prazos para que seu pedido seja feito com carinho:</p>
+        <ul>
+            <li>🗓️ <b>Segunda a Sexta:</b> Antecedência mínima de 24 horas.</li>
+            <li>🚀 <b>Sábados, Domingos e Feriados:</b> Antecedência mínima de 2 horas.</li>
+            <li>⏰ <b>Horário de Retirada/Entrega:</b> 08:00 às 17:00.</li>
+        </ul>
+        <a href="https://wa.me/5551985803243?text=Olá, tenho uma dúvida sobre o agendamento" target="_blank" class="btn-duvida">💬 Tirar dúvidas no WhatsApp</a>
+        <button class="btn-entendi" onclick="fecharAviso()">Entendi, fechar aviso!</button>
+    </div>
+</div>
 
 <header>
     <div class="logo-container">
@@ -92,6 +140,7 @@
             <span class="name-josi">Josi</span>
             <span class="name-doces">Doces</span>
             <span class="name-gourmet">GOURMET</span>
+            <span class="name-contato">(51) 98580-3243</span>
         </div>
     </div>
     <h1>🍬 Josi Doces Gourmet</h1>
@@ -99,7 +148,7 @@
 </header>
 
 <div class="container">
-    <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p><button class="btn-add" onclick="add('Torta de Bolacha (1kg)', 55)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p><button class="btn-add" onclick="add('Torta de Bolacha', 55)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Torta de Bolacha no Pote (P)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (P)', 10)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Torta de Bolacha no Pote (G)</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (G)', 12)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo de Chocolate no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Chocolate no Pote', 12)">Adicionar ao Carrinho</button></div>
@@ -176,7 +225,10 @@ const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 const campoData = document.getElementById('dataAgendamento');
 const campoHora = document.getElementById('horaAgendamento');
 
-// NOVA FUNÇÃO: Esconde/Mostra o carrinho para não atrapalhar
+function fecharAviso() {
+    document.getElementById("modalAviso").style.display = "none";
+}
+
 function toggleVisibilidadeCarrinho() {
     const box = document.getElementById("carrinhoBox");
     const btn = document.getElementById("btnToggle");
@@ -211,6 +263,7 @@ function salvarDados() {
 }
 
 function carregarDados() {
+    document.getElementById("modalAviso").style.display = "block";
     const salvo = localStorage.getItem('pedidoJosiDoces');
     if (salvo) {
         const d = JSON.parse(salvo);
