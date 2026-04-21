@@ -1,4 +1,4 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -24,7 +24,7 @@
         .logo-content .name-doces { font-size: 16px; text-transform: uppercase; letter-spacing: 1px; display: block; border-top: 1px solid #ffccd5; margin-top: 2px; padding-top: 2px; }
         .logo-content .name-gourmet { font-size: 10px; font-weight: bold; color: #ff8fa3; display: block; }
 
-        .container { padding: 20px; max-width: 500px; margin: auto; padding-bottom: 300px; } 
+        .container { padding: 20px; max-width: 500px; margin: auto; padding-bottom: 350px; } 
         label { display: block; margin-top: 20px; font-weight: bold; color: #ff4d6d; font-size: 15px; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: 1px solid #ffccd5; box-sizing: border-box; background: white; font-size: 16px; }
         .card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ffe5ec; }
@@ -39,15 +39,41 @@
         
         #secaoDadosPedido { display: none; margin-top: 30px; border-top: 2px dashed #ffccd5; padding-top: 10px; }
 
+        /* AJUSTE DO CARRINHO PARA NÃO FICAR EM CIMA */
         #carrinhoBox { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: white; padding: 12px 20px; 
-            border-radius: 20px 20px 0 0; 
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1); 
-            z-index: 1000; max-height: 70vh; 
-            overflow-y: auto; text-align: center; 
-            display: none; 
+            position: fixed; 
+            bottom: 10px; 
+            right: 10px; 
+            left: 50px; /* Deixa um espaço na esquerda para clicar nos campos */
+            background: white; 
+            padding: 15px; 
+            border-radius: 20px; 
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2); 
+            z-index: 1000; 
+            max-height: 80vh; 
+            overflow-y: auto; 
+            display: none;
+            border: 2px solid #ffccd5;
         }
+
+        .toggle-carrinho {
+            position: fixed;
+            bottom: 20px;
+            left: 10px;
+            width: 45px;
+            height: 45px;
+            background: #ff4d6d;
+            color: white;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
         #pixDisplay { display: none; background: #fff9fa; padding: 10px; border-radius: 12px; margin-top: 10px; border: 2px dashed #ff4d6d; }
         
         .item-carrinho { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #fef0f3; font-size: 14px; }
@@ -55,7 +81,7 @@
         .remover { color: #ff4d6d; font-weight: bold; cursor: pointer; padding-left: 10px; }
         #blocoEndereco { display: none; }
         .total-destaque { color: #ff4d6d; font-size: 1.1em; margin-top: 2px; }
-        #resumo { margin-top: 5px; font-size: 15px; }
+        #resumo { margin-top: 5px; font-size: 15px; text-align: center; }
     </style>
 </head>
 <body>
@@ -75,12 +101,10 @@
 <div class="container">
     <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p><button class="btn-add" onclick="add('Torta de Bolacha', 55)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Torta de Bolacha no Pote (P)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (P)', 10)">Adicionar ao Carrinho</button></div>
-    
     <div class="card"><h3>Torta de Bolacha no Pote (G)</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (G)', 12)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo de Chocolate no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Chocolate no Pote', 12)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo no Pote com Pudim</h3><p class="price">R$ 14,00</p><button class="btn-add" onclick="add('Bolo no Pote com Pudim', 14)">Adicionar ao Carrinho</button></div>
-    
-    <div class="card"><h3>Bolo de Stikadinho no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo deStikadinho no Pote', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Bolo de Stikadinho no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Stikadinho no Pote', 12)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo de Cenoura no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Cenoura no Pote', 12)">Adicionar ao Carrinho</button></div>
 
     <div id="secaoDadosPedido">
@@ -121,7 +145,10 @@
     </div>
 </div>
 
+<div id="btnToggle" class="toggle-carrinho" onclick="toggleVisibilidadeCarrinho()">🛒</div>
+
 <div id="carrinhoBox">
+    <div style="text-align: right;"><span onclick="toggleVisibilidadeCarrinho()" style="cursor:pointer; font-weight:bold; color:#ff4d6d">FECHAR [X]</span></div>
     <div id="itensCarrinhoLista"></div>
     <div id="detalhesCarrinhoLista"></div>
     <div id="resumo"><b>Total: R$ 0,00</b></div>
@@ -148,6 +175,19 @@ const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
 const campoData = document.getElementById('dataAgendamento');
 const campoHora = document.getElementById('horaAgendamento');
+
+// NOVA FUNÇÃO: Esconde/Mostra o carrinho para não atrapalhar
+function toggleVisibilidadeCarrinho() {
+    const box = document.getElementById("carrinhoBox");
+    const btn = document.getElementById("btnToggle");
+    if (box.style.display === "none" || box.style.display === "") {
+        box.style.display = "block";
+        btn.innerText = "X";
+    } else {
+        box.style.display = "none";
+        btn.innerText = "🛒";
+    }
+}
 
 function mascaraTelefone(i) {
     let v = i.value.replace(/\D/g, "");
@@ -252,13 +292,16 @@ function validarTudo() {
 function atualizar() {
     const secaoDados = document.getElementById("secaoDadosPedido");
     const carrinhoBox = document.getElementById("carrinhoBox");
+    const btnToggle = document.getElementById("btnToggle");
     
     if (carrinho.length > 0) {
         secaoDados.style.display = "block";
         carrinhoBox.style.display = "block";
+        btnToggle.style.display = "flex";
     } else {
         secaoDados.style.display = "none";
         carrinhoBox.style.display = "none";
+        btnToggle.style.display = "none";
     }
 
     const listaDiv = document.getElementById("itensCarrinhoLista");
