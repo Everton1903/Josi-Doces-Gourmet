@@ -34,6 +34,7 @@
         
         .btn-add { background: #25D366; }
         .btn-finalizar { background: #25D366; padding: 10px; font-size: 14px; } 
+        .btn-finalizar:disabled { background: #ccc; cursor: not-allowed; }
         .btn-pix { background: #00b4d8; padding: 10px; font-size: 14px; }
         .btn-copy-total { background: #5a189a; margin-bottom: 5px; padding: 10px; font-size: 14px; }
         .btn-mp { background: #009ee3; padding: 10px; font-size: 14px; }
@@ -186,7 +187,7 @@
         </div>
 
         <label>💳 Forma de Pagamento</label>
-        <select id="pagamento" onchange="verificarPgto(); salvarDados();">
+        <select id="pagamento" onchange="resetPagamentoFluxo(); salvarDados();">
             <option value="Pix">Pix</option>
             <option value="Cartao_Credito">Cartão de Crédito</option>
             <option value="Cartao_Debito">Cartão de Debito</option>
@@ -206,7 +207,7 @@
     <button id="btnPagarMP" onclick="abrirMercadoPago()" class="btn-mp" style="display:none;">💳 2º Pagar no Cartão</button>
     <button id="btnGerarPix" onclick="gerarPixReal()" class="btn-pix" style="display:none;">💎 1º Gerar PIX Copia e Cola</button>
     
-    <button id="btnWhatsapp" onclick="finalizarZap()" class="btn-finalizar">✅ Enviar Pedido ao WhatsApp</button>
+    <button id="btnWhatsapp" onclick="finalizarZap()" class="btn-finalizar" disabled>⚠️ Finalize o pagamento acima</button>
     
     <div id="pixDisplay">
         <div id="qrcode" style="display: flex; justify-content: center;"></div>
@@ -218,6 +219,7 @@
 <script>
 let carrinho = [];
 let pixGerado = false;
+let cartaoIniciado = false;
 const CHAVE_PIX = "00431179026"; 
 const NOME_RECEBEDOR = "JOSI DOCES";
 const CIDADE_RECEBEDOR = "VENANCIO AIRES";
@@ -381,6 +383,13 @@ function atualizar() {
     return total;
 }
 
+function resetPagamentoFluxo() {
+    pixGerado = false;
+    cartaoIniciado = false;
+    document.getElementById("pixDisplay").style.display = "none";
+    verificarPgto();
+}
+
 function verificarPgto() {
     const pag = document.getElementById("pagamento").value;
     const btnPix = document.getElementById("btnGerarPix");
@@ -388,18 +397,43 @@ function verificarPgto() {
     const btnMP = document.getElementById("btnPagarMP");
     const btnZap = document.getElementById("btnWhatsapp");
 
-    btnPix.style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
-    btnCopy.style.display = (pag.includes("Cartao")) ? "block" : "none";
-    btnMP.style.display = (pag.includes("Cartao")) ? "block" : "none";
-    
-    btnZap.innerText = pag.includes("Cartao") ? "✅ 3º Enviar Pedido ao WhatsApp" : "✅ Enviar Pedido ao WhatsApp";
+    // Lógica para Pix
+    if (pag === "Pix") {
+        btnPix.style.display = !pixGerado ? "block" : "none";
+        btnCopy.style.display = "none";
+        btnMP.style.display = "none";
+        
+        if (pixGerado) {
+            btnZap.disabled = false;
+            btnZap.innerText = "✅ Enviar Pedido ao WhatsApp";
+        } else {
+            btnZap.disabled = true;
+            btnZap.innerText = "⚠️ Gere o Pix primeiro";
+        }
+    } 
+    // Lógica para Cartão
+    else {
+        btnPix.style.display = "none";
+        btnCopy.style.display = "block";
+        btnMP.style.display = "block";
+        
+        if (cartaoIniciado) {
+            btnZap.disabled = false;
+            btnZap.innerText = "✅ 3º Enviar Pedido ao WhatsApp";
+        } else {
+            btnZap.disabled = true;
+            btnZap.innerText = "⚠️ Pague no Cartão primeiro";
+        }
+    }
     
     atualizar();
 }
 
 function abrirMercadoPago() {
     if (!validarTudo()) return;
+    cartaoIniciado = true;
     salvarDados();
+    verificarPgto();
     window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank");
 }
 
@@ -409,19 +443,20 @@ function gerarPixReal() {
     const conta = fv("00", "BR.GOV.BCB.PIX") + fv("01", CHAVE_PIX);
     let payload = fv("00", "01") + fv("26", conta) + fv("52", "0000") + fv("53", "986") + fv("54", valor) + fv("58", "BR") + fv("59", NOME_RECEBEDOR) + fv("60", CIDADE_RECEBEDOR) + fv("62", fv("05", "***")) + "6304";
     const res = payload + crc16(payload);
+    
     pixGerado = true;
     document.getElementById("pixDisplay").style.display = "block";
     document.getElementById("brcode").value = res;
     document.getElementById("qrcode").innerHTML = "";
     new QRCode(document.getElementById("qrcode"), { text: res, width: 120, height: 120 });
-    document.getElementById("btnGerarPix").style.display = "none";
+    
+    verificarPgto();
 }
 
 function finalizarZap() {
     if (!validarTudo()) return;
+    
     const pag = document.getElementById("pagamento").value;
-    if (pag === "Pix" && !pixGerado) { alert("⚠️ Gere o Pix antes de enviar!"); return; }
-
     const nome = document.getElementById("nome").value;
     const tel = document.getElementById("telefone").value;
     const bairroText = document.getElementById("bairro").options[document.getElementById("bairro").selectedIndex].text;
@@ -444,20 +479,37 @@ function finalizarZap() {
     msg += `🛒 *ÍTENS:* \n${itensMsg}\n`;
     msg += `⭐ *TOTAL: R$ ${atualizar().toFixed(2).replace('.', ',')}*`;
 
+    // Abrir WhatsApp
     window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
+
+    // --- LIMPAR CARRINHO E RESETAR TUDO ---
+    setTimeout(() => {
+        carrinho = [];
+        pixGerado = false;
+        cartaoIniciado = false;
+        localStorage.removeItem('pedidoJosiDoces');
+        
+        // Resetar campos visuais
+        document.getElementById("pixDisplay").style.display = "none";
+        document.getElementById("carrinhoBox").style.display = "none";
+        document.getElementById("btnToggle").style.display = "none";
+        document.getElementById("secaoDadosPedido").style.display = "none";
+        
+        atualizar();
+        alert("✅ Pedido enviado! Seu carrinho foi limpo.");
+    }, 1000);
 }
 
 function add(n, p) { 
     carrinho.push({nome: n, preco: p}); 
-    resetPixStatus(); 
+    resetPagamentoFluxo();
     salvarDados(); 
 }
 function remover(index) { 
     carrinho.splice(index, 1); 
-    resetPixStatus(); 
+    resetPagamentoFluxo();
     salvarDados(); 
 }
-function resetPixStatus() { pixGerado = false; document.getElementById("pixDisplay").style.display = "none"; verificarPgto(); }
 function copiarValorNumerico() { navigator.clipboard.writeText(atualizar().toFixed(2)); alert("✅ Valor copiado!"); }
 function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("✅ Pix Copiado!"); }
 function fv(id, v) { return id + v.length.toString().padStart(2, '0') + v; }
@@ -473,7 +525,7 @@ function crc16(data) {
 }
 function alternarEndereco() {
     document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "0") ? "none" : "block";
-    resetPixStatus();
+    resetPagamentoFluxo();
 }
 
 window.onload = carregarDados;
