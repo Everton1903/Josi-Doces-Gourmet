@@ -7,131 +7,116 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fff0f3; color: #444; }
+        /* Cores: Marrom e Creme */
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fdf5e6; color: #4b3621; }
+        
         header { 
-            background: linear-gradient(135deg, #ff4d6d, #ff8fa3); 
-            color: white; text-align: center; padding: 40px 20px;
+            background: linear-gradient(135deg, #5d4037, #8d6e63); 
+            color: #fff; text-align: center; padding: 40px 20px;
             border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
-            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+
         .logo-container {
-            width: 130px; height: 130px; background: white; border-radius: 50%;
+            width: 130px; height: 130px; background: #fff; border-radius: 50%;
             margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-            border: 5px solid #ffccd5; box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            border: 5px solid #d7ccc8; box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
-        .logo-content { text-align: center; color: #ff4d6d; line-height: 1.1; }
+
+        .logo-content { text-align: center; color: #5d4037; line-height: 1.1; }
         .logo-content .name-josi { font-size: 24px; font-weight: bold; font-family: 'Georgia', serif; display: block; }
-        .logo-content .name-doces { font-size: 16px; text-transform: uppercase; letter-spacing: 1px; display: block; border-top: 1px solid #ffccd5; margin-top: 2px; padding-top: 2px; }
-        .logo-content .name-gourmet { font-size: 10px; font-weight: bold; color: #ff8fa3; display: block; }
-        .logo-content .name-contato { font-size: 9px; font-weight: bold; color: #ff4d6d; display: block; margin-top: 2px; }
+        .logo-content .name-doces { font-size: 16px; text-transform: uppercase; letter-spacing: 1px; display: block; border-top: 1px solid #d7ccc8; margin-top: 2px; padding-top: 2px; }
+        .logo-content .name-gourmet { font-size: 10px; font-weight: bold; color: #8d6e63; display: block; }
+        .logo-content .name-contato { font-size: 9px; font-weight: bold; color: #5d4037; display: block; margin-top: 2px; }
 
         .container { padding: 20px; max-width: 500px; margin: auto; padding-bottom: 350px; } 
-        label { display: block; margin-top: 20px; font-weight: bold; color: #ff4d6d; font-size: 15px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: 1px solid #ffccd5; box-sizing: border-box; background: white; font-size: 16px; }
-        .card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ffe5ec; }
-        .price { color: #ff4d6d; font-weight: bold; font-size: 1.3em; margin: 10px 0; }
+        label { display: block; margin-top: 20px; font-weight: bold; color: #5d4037; font-size: 15px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: 1px solid #d7ccc8; box-sizing: border-box; background: white; font-size: 16px; }
+
+        .card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #d7ccc8; }
+        .price { color: #8d6e63; font-weight: bold; font-size: 1.3em; margin: 10px 0; }
         button { color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; font-size: 16px; }
         
-        .btn-add { background: #25D366; }
-        .btn-finalizar { background: #25D366; padding: 10px; font-size: 14px; } 
-        .btn-finalizar:disabled { background: #ccc; cursor: not-allowed; }
-        .btn-pix { background: #00b4d8; padding: 10px; font-size: 14px; }
-        .btn-copy-total { background: #5a189a; margin-bottom: 5px; padding: 10px; font-size: 14px; }
+        .btn-add { background: #25D366; } 
+        .btn-finalizar { background: #25D366; padding: 10px; font-size: 14px; margin-top: 15px; } 
+        .btn-finalizar:disabled { background: #ccc !important; cursor: not-allowed; }
+        .btn-pix { background: #5d4037; padding: 10px; font-size: 14px; }
+        .btn-copy-total { background: #8d6e63; margin-bottom: 5px; padding: 10px; font-size: 14px; }
         .btn-mp { background: #009ee3; padding: 10px; font-size: 14px; }
         
-        #secaoDadosPedido { display: none; margin-top: 30px; border-top: 2px dashed #ffccd5; padding-top: 10px; }
+        #secaoDadosPedido { display: none; margin-top: 30px; border-top: 2px dashed #d7ccc8; padding-top: 10px; }
+
+        .modal-aviso {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); overflow-y: auto;
+        }
+
+        .modal-conteudo {
+            background-color: #fff; margin: 5% auto; padding: 25px;
+            border-radius: 25px; width: 85%; max-width: 400px;
+            text-align: center; border: 3px solid #5d4037;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: bounceIn 0.5s ease;
+        }
+
+        .menu-visual-title { color: #5d4037; font-family: 'Georgia', serif; font-size: 26px; margin-bottom: 20px; border-bottom: 2px solid #d7ccc8; padding-bottom: 5px; }
+        .menu-item-visual { text-align: left; margin-bottom: 15px; border-bottom: 1px solid #f5f5dc; padding-bottom: 8px; }
+        .menu-item-visual h4 { margin: 0; color: #5d4037; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
+        .menu-item-visual p { margin: 2px 0; font-size: 11px; color: #8d6e63; }
+        .menu-item-visual .preco-v { float: right; color: #5d4037; font-weight: bold; font-size: 14px; }
+
+        @keyframes bounceIn { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .btn-entendi { background: #5d4037; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        .btn-duvida { background: #25D366; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; text-decoration: none; display: block; box-sizing: border-box; margin-bottom: 10px; }
 
         #carrinhoBox { 
-            position: fixed; 
-            bottom: 10px; 
-            right: 10px; 
-            left: 50px; 
-            background: white; 
-            padding: 15px; 
-            border-radius: 20px; 
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.2); 
-            z-index: 1000; 
-            max-height: 80vh; 
-            overflow-y: auto; 
-            display: none;
-            border: 2px solid #ffccd5;
+            position: fixed; bottom: 10px; right: 10px; left: 50px; 
+            background: white; padding: 15px; border-radius: 20px; 
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2); z-index: 1000; 
+            max-height: 80vh; overflow-y: auto; display: none; border: 2px solid #d7ccc8;
         }
 
         .toggle-carrinho {
-            position: fixed;
-            bottom: 20px;
-            left: 10px;
-            width: 45px;
-            height: 45px;
-            background: #ff4d6d;
-            color: white;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 20px;
-            cursor: pointer;
+            position: fixed; bottom: 20px; left: 10px; width: 45px; height: 45px;
+            background: #5d4037; color: white; border-radius: 50%;
+            display: none; align-items: center; justify-content: center;
+            z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 20px; cursor: pointer;
         }
-        
-        #pixDisplay { display: none; background: #fff9fa; padding: 10px; border-radius: 12px; margin-top: 10px; border: 2px dashed #ff4d6d; }
-        
-        .item-carrinho { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #fef0f3; font-size: 14px; }
-        .detalhe-extra { display: flex; justify-content: space-between; padding: 2px 0; font-size: 12px; color: #666; font-style: italic; }
-        .remover { color: #ff4d6d; font-weight: bold; cursor: pointer; padding-left: 10px; }
-        #blocoEndereco { display: none; }
-        .total-destaque { color: #ff4d6d; font-size: 1.1em; margin-top: 2px; }
-        #resumo { margin-top: 5px; font-size: 15px; text-align: center; }
 
-        /* Estilos do Modal de Aviso */
-        .modal-aviso {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-        }
-        .modal-conteudo {
-            background-color: white;
-            margin: 10% auto;
-            padding: 25px;
-            border-radius: 25px;
-            width: 85%;
-            max-width: 400px;
-            text-align: center;
-            border: 3px solid #ff4d6d;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: bounceIn 0.5s ease;
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0.7); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .modal-conteudo h2 { color: #ff4d6d; margin-top: 0; font-size: 22px; }
-        .modal-conteudo p { font-size: 15px; margin-bottom: 15px; }
-        .modal-conteudo ul { text-align: left; font-size: 14px; color: #555; margin-bottom: 20px; padding-left: 20px; }
-        .btn-entendi { background: #ff4d6d; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
-        .btn-duvida { background: #25D366; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; text-decoration: none; display: block; box-sizing: border-box; }
+        .item-carrinho { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; font-size: 14px; }
+        .remover { color: red; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        #resumo { margin-top: 15px; font-size: 18px; text-align: center; color: #5d4037; border-top: 2px solid #eee; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div id="modalAviso" class="modal-aviso">
+<div id="modalAviso" class="modal-aviso" style="display: block;">
     <div class="modal-conteudo">
-        <h2>⚠️ Regras de Agendamento</h2>
-        <p>Por favor, atente-se aos prazos para que seu pedido seja feito com carinho:</p>
-        <ul>
-            <li>🗓️ <b>Segunda a Sexta:</b> Antecedência mínima de 24 horas.</li>
-            <li>🚀 <b>Sábados, Domingos e Feriados:</b> Antecedência mínima de 2 horas.</li>
-            <li>⏰ <b>Horário de Retirada/Entrega:</b> 08:00 às 17:00.</li>
+        <h2>⚠️ Horários de Encomendas</h2>
+        <p>Confira nossos turnos para agendamento:</p>
+        <ul style="text-align: left; font-size: 14px; color: #555;">
+            <li>🗓️ <b>Segunda a Sexta:</b> Apenas no turno da <b>MANHÃ</b> (08h às 12h).</li>
+            <li>🚀 <b>Sábados, Domingos e Feriados:</b> Liberado o <b>DIA TODO</b> (08h às 17h).</li>
         </ul>
-        <a href="https://wa.me/5551985803243?text=Olá, tenho uma dúvida sobre o agendamento" target="_blank" class="btn-duvida">💬 Tirar dúvidas no WhatsApp</a>
-        <button class="btn-entendi" onclick="fecharAviso()">Entendi, fechar aviso!</button>
+        <a href="https://wa.me/5551985803243?text=Olá, tenho uma dúvida sobre o agendamento" target="_blank" class="btn-duvida">💬 Dúvidas no WhatsApp</a>
+        <button class="btn-entendi" onclick="abrirCardapioVisual()">Ver Cardápio</button>
+    </div>
+</div>
+
+<div id="modalCardapio" class="modal-aviso">
+    <div class="modal-conteudo">
+        <div class="menu-visual-title">Cardápio</div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 55,00</span><h4>Torta de Bolacha</h4><p>1 Kg</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 10,00</span><h4>Torta de Bolacha Pequena</h4><p>250 gramas</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 12,00</span><h4>Torta de Bolacha Grande</h4><p>300 gramas</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 10,00</span><h4>Torta de Ninho Pequena</h4><p>250 gramas</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 12,00</span><h4>Bolo de Pote Chocolate</h4><p>250 gramas</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 12,00</span><h4>Bolo de Pote Brigadeiro</h4><p>250 gramas</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 14,00</span><h4>Bolo no Pote com Pudim</h4><p>250 gramas</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 12,00</span><h4>Bolo de Stikadinho no Pote</h4><p>250 gramas</p></div>
+        <div class="menu-item-visual"><span class="preco-v">R$ 12,00</span><h4>Bolo de Cenoura no Pote</h4><p>250 gramas</p></div>
+        <button class="btn-entendi" onclick="fecharCardapioVisual()">Fazer meu Pedido ➔</button>
     </div>
 </div>
 
@@ -145,14 +130,16 @@
         </div>
     </div>
     <h1>🍬 Josi Doces Gourmet</h1>
-    <p>Escolha suas doçuras abaixo!</p>
+    <p>Escolha suas delícias abaixo!</p>
 </header>
 
 <div class="container">
     <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p><button class="btn-add" onclick="add('Torta de Bolacha (1Kg)', 55)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Torta de Bolacha no Pote (P)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (P)', 10)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Torta de Bolacha no Pote (G)</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Torta de Bolacha no Pote (G)', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Torta de Bolacha Pequena (250g)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Bolacha Pequena', 10)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Torta de Bolacha Grande (300g)</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Torta de Bolacha Grande', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Torta de Ninho Pequena (250g)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Ninho Pequena', 10)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo de Chocolate no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Chocolate no Pote', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Bolo de Brigadeiro no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Brigadeiro no Pote', 12)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo no Pote com Pudim</h3><p class="price">R$ 14,00</p><button class="btn-add" onclick="add('Bolo no Pote com Pudim', 14)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo de Stikadinho no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Stikadinho no Pote', 12)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Bolo de Cenoura no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Cenoura no Pote', 12)">Adicionar ao Carrinho</button></div>
@@ -180,10 +167,10 @@
             <textarea id="endereco" placeholder="Rua, número e referência" oninput="salvarDados()"></textarea>
         </div>
 
-        <label>⏰ Agendamento (08:00 às 17:00)</label>
+        <label>⏰ Agendamento (Seg-Sex apenas Manhã)</label>
         <div style="display:flex; gap:5px;">
-            <input type="date" id="dataAgendamento" onchange="verificarPgto(); salvarDados();">
-            <input type="time" id="horaAgendamento" onchange="verificarPgto(); salvarDados();">
+            <input type="date" id="dataAgendamento" onchange="resetPagamentoFluxo(); salvarDados();">
+            <input type="time" id="horaAgendamento" onchange="resetPagamentoFluxo(); salvarDados();">
         </div>
 
         <label>💳 Forma de Pagamento</label>
@@ -198,25 +185,36 @@
 <div id="btnToggle" class="toggle-carrinho" onclick="toggleVisibilidadeCarrinho()">🛒</div>
 
 <div id="carrinhoBox">
-    <div style="text-align: right;"><span onclick="toggleVisibilidadeCarrinho()" style="cursor:pointer; font-weight:bold; color:#ff4d6d">FECHAR [X]</span></div>
+    <div style="text-align: right;"><span onclick="toggleVisibilidadeCarrinho()" style="cursor:pointer; font-weight:bold; color:#5d4037">FECHAR [X]</span></div>
+    <h3 style="margin-top:0; color:#5d4037;">🛒 Seu Pedido</h3>
+    
     <div id="itensCarrinhoLista"></div>
-    <div id="detalhesCarrinhoLista"></div>
     <div id="resumo"><b>Total: R$ 0,00</b></div>
-    
-    <button id="btnCopiarValor" onclick="copiarValorNumerico()" class="btn-copy-total" style="display:none;">📋 1º Copiar Valor Total</button>
-    <button id="btnPagarMP" onclick="abrirMercadoPago()" class="btn-mp" style="display:none;">💳 2º Pagar no Cartão</button>
-    <button id="btnGerarPix" onclick="gerarPixReal()" class="btn-pix" style="display:none;">💎 1º Gerar PIX Copia e Cola</button>
-    
-    <button id="btnWhatsapp" onclick="finalizarZap()" class="btn-finalizar" disabled>⚠️ Finalize o pagamento acima</button>
-    
-    <div id="pixDisplay">
-        <div id="qrcode" style="display: flex; justify-content: center;"></div>
-        <textarea id="brcode" readonly style="font-size: 10px; height: 50px; margin: 10px 0; background: #f0f0f0; border: 1px solid #ccc; width: 100%;"></textarea>
-        <button onclick="copiarPix()" style="background:#444; padding: 8px; font-size: 12px;">Copiar Código Pix</button>
+
+    <div style="margin-top:15px;">
+        <button id="btnCopiarValor" onclick="copiarValorNumerico()" class="btn-copy-total" style="display:none;">📋 1º Copiar Valor Total</button>
+        <button id="btnPagarMP" onclick="abrirMercadoPago()" class="btn-mp" style="display:none;">💳 2º Pagar no Cartão</button>
+        <button id="btnGerarPix" onclick="gerarPixReal()" class="btn-pix" style="display:none;">💎 1º Gerar PIX Copia e Cola</button>
+        
+        <div id="pixDisplay" style="display:none; margin-top:10px; background:#f9f9f9; padding:10px; border-radius:10px; border:1px solid #ddd;">
+            <div id="qrcode" style="display: flex; justify-content: center; margin-bottom:10px;"></div>
+            <textarea id="brcode" readonly style="font-size: 10px; height: 50px; width: 100%; margin-bottom:5px;"></textarea>
+            <button onclick="copiarPix()" style="background:#444; padding: 8px; font-size: 12px; width:100%;">Copiar Código Pix</button>
+        </div>
+
+        <button id="btnWhatsapp" onclick="finalizarZap()" class="btn-finalizar" disabled>⚠️ Siga os passos acima</button>
     </div>
 </div>
 
 <script>
+function abrirCardapioVisual() {
+    document.getElementById("modalAviso").style.display = "none";
+    document.getElementById("modalCardapio").style.display = "block";
+}
+function fecharCardapioVisual() {
+    document.getElementById("modalCardapio").style.display = "none";
+}
+
 let carrinho = [];
 let pixGerado = false;
 let cartaoIniciado = false;
@@ -224,23 +222,11 @@ const CHAVE_PIX = "00431179026";
 const NOME_RECEBEDOR = "JOSI DOCES";
 const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
-const campoData = document.getElementById('dataAgendamento');
-const campoHora = document.getElementById('horaAgendamento');
-
-function fecharAviso() {
-    document.getElementById("modalAviso").style.display = "none";
-}
-
 function toggleVisibilidadeCarrinho() {
     const box = document.getElementById("carrinhoBox");
     const btn = document.getElementById("btnToggle");
-    if (box.style.display === "none" || box.style.display === "") {
-        box.style.display = "block";
-        btn.innerText = "X";
-    } else {
-        box.style.display = "none";
-        btn.innerText = "🛒";
-    }
+    box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+    btn.innerText = box.style.display === "block" ? "X" : "🛒";
 }
 
 function mascaraTelefone(i) {
@@ -256,8 +242,8 @@ function salvarDados() {
         telefone: document.getElementById("telefone").value,
         bairro: document.getElementById("bairro").value,
         endereco: document.getElementById("endereco").value,
-        data: campoData.value,
-        hora: campoHora.value,
+        data: document.getElementById('dataAgendamento').value,
+        hora: document.getElementById('horaAgendamento').value,
         pagamento: document.getElementById("pagamento").value,
         carrinho: carrinho
     };
@@ -265,7 +251,6 @@ function salvarDados() {
 }
 
 function carregarDados() {
-    document.getElementById("modalAviso").style.display = "block";
     const salvo = localStorage.getItem('pedidoJosiDoces');
     if (salvo) {
         const d = JSON.parse(salvo);
@@ -275,243 +260,108 @@ function carregarDados() {
         document.getElementById("endereco").value = d.endereco || "";
         document.getElementById("pagamento").value = d.pagamento || "Pix";
         carrinho = d.carrinho || [];
-        
         const hoje = new Date().toISOString().split("T")[0];
-        campoData.value = (d.data >= hoje) ? d.data : hoje;
-        campoHora.value = d.hora || "";
-
+        document.getElementById('dataAgendamento').value = (d.data >= hoje) ? d.data : hoje;
+        document.getElementById('horaAgendamento').value = d.hora || "08:00";
         alternarEndereco();
         verificarPgto();
     } else {
-        const agora = new Date();
-        campoData.value = agora.toISOString().split("T")[0];
-        let horaSugestao = new Date(agora.getTime() + (2 * 60 * 60 * 1000));
-        let hh = String(horaSugestao.getHours()).padStart(2, '0');
-        let mm = String(horaSugestao.getMinutes()).padStart(2, '0');
-        campoHora.value = `${Math.max(8, Math.min(17, hh))}:${mm}`;
+        document.getElementById('dataAgendamento').value = new Date().toISOString().split("T")[0];
+        document.getElementById('horaAgendamento').value = "08:00";
     }
-    campoData.min = new Date().toISOString().split("T")[0];
+    document.getElementById('dataAgendamento').min = new Date().toISOString().split("T")[0];
 }
 
 function validarTudo() {
     const nome = document.getElementById("nome").value.trim();
     const telRaw = document.getElementById("telefone").value.replace(/\D/g, "");
-    const bairroSel = document.getElementById("bairro");
+    const dataInput = document.getElementById('dataAgendamento').value;
+    const horaInput = document.getElementById('horaAgendamento').value;
+    const bairro = document.getElementById("bairro").value;
     const endereco = document.getElementById("endereco").value.trim();
-    const data = campoData.value;
-    const hora = campoHora.value;
-    const agora = new Date();
 
     if (!nome) { alert("⚠️ Informe seu nome."); return false; }
-    if (telRaw.length !== 11 || telRaw[2] !== "9") { 
-        alert("⚠️ Por favor, informe um WhatsApp válido com DDD e o 9 na frente."); 
-        return false; 
-    }
-
+    if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
     if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
-    if (bairroSel.value !== "0" && !endereco) { alert("⚠️ Informe o endereço de entrega."); return false; }
-    if (!data) { alert("⚠️ Escolha a data."); return false; }
-    if (!hora) { alert("⚠️ Escolha o horário."); return false; }
-
-    const [ano, mes, dia] = data.split('-');
-    const [h, m] = hora.split(':');
-    const dataAgendada = new Date(ano, mes - 1, dia, h, m);
+    if (!dataInput || !horaInput) { alert("⚠️ Selecione data e hora."); return false; }
+    if (bairro !== "0" && !endereco) { alert("⚠️ Informe o endereço de entrega."); return false; }
     
-    const diaSemana = dataAgendada.getDay();
-    const ehFinalDeSemana = (diaSemana === 0 || diaSemana === 6);
+    const [ano, mes, dia] = dataInput.split('-');
+    const dt = new Date(ano, mes - 1, dia);
+    const diaSemana = dt.getDay(); 
     const feriados = ['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '12-25'];
-    const ehFeriado = feriados.includes(`${mes}-${dia}`);
+    const isFeriado = feriados.includes(`${mes}-${dia}`);
 
-    if (ehFinalDeSemana || ehFeriado) {
-        const limite2h = new Date(agora.getTime() + (2 * 60 * 60 * 1000));
-        if (dataAgendada < limite2h) {
-            alert("⚠️ Sábados, domingos e feriados: mínimo 2 horas de antecedência.");
-            return false;
-        }
-    } else {
-        const limite24h = new Date(agora.getTime() + (24 * 60 * 60 * 1000));
-        if (dataAgendada < limite24h) {
-            alert("⚠️ Pedidos de segunda a sexta: mínimo de 1 dia (24h) de antecedência.");
+    if (diaSemana >= 1 && diaSemana <= 5 && !isFeriado) {
+        if (horaInput > "12:00") {
+            alert("⚠️ De segunda a sexta-feira, só aceitamos encomendas para o turno da MANHÃ (até as 12:00).");
             return false;
         }
     }
 
-    if (hora < "08:00" || hora > "17:00") { 
-        alert("⚠️ Atendimento das 08:00 às 17:00."); 
-        return false; 
+    if (horaInput < "08:00" || horaInput > "17:00") {
+        alert("⚠️ Nosso horário de atendimento é das 08:00 às 17:00.");
+        return false;
     }
 
     return true;
 }
 
 function atualizar() {
-    const secaoDados = document.getElementById("secaoDadosPedido");
-    const carrinhoBox = document.getElementById("carrinhoBox");
-    const btnToggle = document.getElementById("btnToggle");
+    const frete = parseFloat(document.getElementById("bairro").value);
+    const subtotal = carrinho.reduce((acc, item) => acc + item.preco, 0);
+    const total = subtotal + frete;
+    document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     
-    if (carrinho.length > 0) {
-        secaoDados.style.display = "block";
-        carrinhoBox.style.display = "block";
-        btnToggle.style.display = "flex";
-    } else {
-        secaoDados.style.display = "none";
-        carrinhoBox.style.display = "none";
-        btnToggle.style.display = "none";
-    }
-
     const listaDiv = document.getElementById("itensCarrinhoLista");
-    const detalhesDiv = document.getElementById("detalhesCarrinhoLista");
-    listaDiv.innerHTML = ""; detalhesDiv.innerHTML = "";
-    let subtotal = 0;
-    
+    listaDiv.innerHTML = "";
     carrinho.forEach((item, index) => {
-        subtotal += item.preco;
         listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.nome}</span> <span>R$ ${item.preco.toFixed(2)} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
     });
 
-    const bairroSel = document.getElementById("bairro");
-    const frete = parseFloat(bairroSel.value);
-    const dataF = campoData.value.split('-').reverse().join('/');
-    const hora = campoHora.value;
-
-    detalhesDiv.innerHTML += `<div class="detalhe-extra"><span>Subtotal</span> <span>R$ ${subtotal.toFixed(2)}</span></div>`;
-    detalhesDiv.innerHTML += `<div class="detalhe-extra"><span>Frete</span> <span>R$ ${frete.toFixed(2)}</span></div>`;
-    if(hora) detalhesDiv.innerHTML += `<div class="detalhe-extra"><span>Agendado para:</span> <span>${dataF} às ${hora}</span></div>`;
-    
-    let total = subtotal + frete;
-    document.getElementById("resumo").innerHTML = `<b>TOTAL: <span class="total-destaque">R$ ${total.toFixed(2).replace('.', ',')}</span></b>`;
+    document.getElementById("secaoDadosPedido").style.display = carrinho.length > 0 ? "block" : "none";
+    document.getElementById("btnToggle").style.display = carrinho.length > 0 ? "flex" : "none";
     return total;
 }
 
-function resetPagamentoFluxo() {
-    pixGerado = false;
-    cartaoIniciado = false;
-    document.getElementById("pixDisplay").style.display = "none";
-    verificarPgto();
+function resetPagamentoFluxo() { 
+    pixGerado = false; cartaoIniciado = false; 
+    document.getElementById("pixDisplay").style.display = "none"; 
+    verificarPgto(); 
 }
 
 function verificarPgto() {
     const pag = document.getElementById("pagamento").value;
-    const btnPix = document.getElementById("btnGerarPix");
-    const btnCopy = document.getElementById("btnCopiarValor");
-    const btnMP = document.getElementById("btnPagarMP");
     const btnZap = document.getElementById("btnWhatsapp");
-
-    // Lógica para Pix
+    document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
+    document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
+    document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
     if (pag === "Pix") {
-        btnPix.style.display = !pixGerado ? "block" : "none";
-        btnCopy.style.display = "none";
-        btnMP.style.display = "none";
-        
-        if (pixGerado) {
-            btnZap.disabled = false;
-            btnZap.innerText = "✅ Enviar Pedido ao WhatsApp";
-        } else {
-            btnZap.disabled = true;
-            btnZap.innerText = "⚠️ Gere o Pix primeiro";
-        }
-    } 
-    // Lógica para Cartão
-    else {
-        btnPix.style.display = "none";
-        btnCopy.style.display = "block";
-        btnMP.style.display = "block";
-        
-        if (cartaoIniciado) {
-            btnZap.disabled = false;
-            btnZap.innerText = "✅ 3º Enviar Pedido ao WhatsApp";
-        } else {
-            btnZap.disabled = true;
-            btnZap.innerText = "⚠️ Pague no Cartão primeiro";
-        }
+        btnZap.disabled = !pixGerado;
+        btnZap.innerText = pixGerado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Gere o Pix primeiro";
+    } else {
+        btnZap.disabled = !cartaoIniciado;
+        btnZap.innerText = cartaoIniciado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Pague no Cartão primeiro";
     }
-    
     atualizar();
-}
-
-function abrirMercadoPago() {
-    if (!validarTudo()) return;
-    cartaoIniciado = true;
-    salvarDados();
-    verificarPgto();
-    window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank");
-}
-
-function gerarPixReal() {
-    if (!validarTudo()) return;
-    const valor = atualizar().toFixed(2);
-    const conta = fv("00", "BR.GOV.BCB.PIX") + fv("01", CHAVE_PIX);
-    let payload = fv("00", "01") + fv("26", conta) + fv("52", "0000") + fv("53", "986") + fv("54", valor) + fv("58", "BR") + fv("59", NOME_RECEBEDOR) + fv("60", CIDADE_RECEBEDOR) + fv("62", fv("05", "***")) + "6304";
-    const res = payload + crc16(payload);
-    
-    pixGerado = true;
-    document.getElementById("pixDisplay").style.display = "block";
-    document.getElementById("brcode").value = res;
-    document.getElementById("qrcode").innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), { text: res, width: 120, height: 120 });
-    
-    verificarPgto();
-}
-
-function finalizarZap() {
-    if (!validarTudo()) return;
-    
-    const pag = document.getElementById("pagamento").value;
-    const nome = document.getElementById("nome").value;
-    const tel = document.getElementById("telefone").value;
-    const bairroText = document.getElementById("bairro").options[document.getElementById("bairro").selectedIndex].text;
-    const endereco = document.getElementById("endereco").value;
-    const dataF = campoData.value.split('-').reverse().join('/');
-    const hora = campoHora.value;
-    
-    let itensMsg = "";
-    carrinho.forEach(i => {
-        itensMsg += `- ${i.nome} (R$ ${i.preco.toFixed(2).replace('.', ',')})\n`;
-    });
-
-    let msg = `*NOVO PEDIDO - JOSI DOCES*\n\n`;
-    msg += `👤 *Cliente:* ${nome}\n`;
-    msg += `📱 *WhatsApp:* ${tel}\n`;
-    msg += `📍 *Região:* ${bairroText}\n`;
-    if(endereco) msg += `🏠 *Endereço:* ${endereco}\n`;
-    msg += `📅 *Entrega/Retirada:* ${dataF} às ${hora}\n`;
-    msg += `💳 *Pagamento:* ${pag}\n\n`;
-    msg += `🛒 *ÍTENS:* \n${itensMsg}\n`;
-    msg += `⭐ *TOTAL: R$ ${atualizar().toFixed(2).replace('.', ',')}*`;
-
-    // Abrir WhatsApp
-    window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
-
-    // --- LIMPAR CARRINHO E RESETAR TUDO ---
-    setTimeout(() => {
-        carrinho = [];
-        pixGerado = false;
-        cartaoIniciado = false;
-        localStorage.removeItem('pedidoJosiDoces');
-        
-        // Resetar campos visuais
-        document.getElementById("pixDisplay").style.display = "none";
-        document.getElementById("carrinhoBox").style.display = "none";
-        document.getElementById("btnToggle").style.display = "none";
-        document.getElementById("secaoDadosPedido").style.display = "none";
-        
-        atualizar();
-        alert("✅ Pedido enviado! Seu carrinho foi limpo.");
-    }, 1000);
 }
 
 function add(n, p) { 
     carrinho.push({nome: n, preco: p}); 
-    resetPagamentoFluxo();
-    salvarDados(); 
+    resetPagamentoFluxo(); salvarDados(); 
+    if(document.getElementById("carrinhoBox").style.display !== "block") toggleVisibilidadeCarrinho();
 }
-function remover(index) { 
-    carrinho.splice(index, 1); 
-    resetPagamentoFluxo();
-    salvarDados(); 
+
+function remover(index) { carrinho.splice(index, 1); resetPagamentoFluxo(); salvarDados(); }
+
+function alternarEndereco() { 
+    document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "0") ? "none" : "block"; 
 }
-function copiarValorNumerico() { navigator.clipboard.writeText(atualizar().toFixed(2)); alert("✅ Valor copiado!"); }
-function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("✅ Pix Copiado!"); }
+
+function copiarValorNumerico() { if (!validarTudo()) return; navigator.clipboard.writeText(atualizar().toFixed(2)); alert("✅ Valor copiado!"); }
+
+function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("✅ Código Pix Copiado!"); }
+
 function fv(id, v) { return id + v.length.toString().padStart(2, '0') + v; }
 function crc16(data) {
     let crc = 0xFFFF;
@@ -523,9 +373,62 @@ function crc16(data) {
     }
     return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 }
-function alternarEndereco() {
-    document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "0") ? "none" : "block";
-    resetPagamentoFluxo();
+
+function gerarPixReal() {
+    if (!validarTudo()) return; 
+    const valor = atualizar().toFixed(2);
+    const conta = fv("00", "BR.GOV.BCB.PIX") + fv("01", CHAVE_PIX);
+    let payload = fv("00", "01") + fv("26", conta) + fv("52", "0000") + fv("53", "986") + fv("54", valor) + fv("58", "BR") + fv("59", NOME_RECEBEDOR) + fv("60", CIDADE_RECEBEDOR) + fv("62", fv("05", "***")) + "6304";
+    const res = payload + crc16(payload);
+    pixGerado = true;
+    document.getElementById("pixDisplay").style.display = "block";
+    document.getElementById("brcode").value = res;
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), { text: res, width: 120, height: 120 });
+    verificarPgto();
+}
+
+function abrirMercadoPago() { if (!validarTudo()) return; cartaoIniciado = true; verificarPgto(); window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank"); }
+
+// FUNÇÃO ATUALIZADA PARA O WHATSAPP COM TODAS AS INFORMAÇÕES
+function finalizarZap() {
+    if (!validarTudo()) return;
+
+    const nome = document.getElementById("nome").value;
+    const telefone = document.getElementById("telefone").value;
+    const data = document.getElementById('dataAgendamento').value.split('-').reverse().join('/');
+    const hora = document.getElementById('horaAgendamento').value;
+    const formaPgto = document.getElementById("pagamento").value;
+    const selectBairro = document.getElementById("bairro");
+    const bairroNome = selectBairro.options[selectBairro.selectedIndex].text;
+    const freteValor = parseFloat(selectBairro.value);
+    const endereco = document.getElementById("endereco").value;
+    
+    let subtotal = carrinho.reduce((acc, item) => acc + item.preco, 0);
+    let totalGeral = subtotal + freteValor;
+
+    let msg = `*🍮 NOVO PEDIDO - JOSI DOCES*\n\n`;
+    msg += `*👤 CLIENTE:* ${nome}\n`;
+    msg += `*📞 CONTATO:* ${telefone}\n`;
+    msg += `*🗓️ ENTREGA/RETIRADA:* ${data} às ${hora}\n`;
+    msg += `*💳 PAGAMENTO:* ${formaPgto}\n\n`;
+    
+    msg += `*📍 LOCAL:* ${bairroNome}\n`;
+    if(freteValor > 0) {
+        msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`;
+    } else {
+        msg += `\n`;
+    }
+
+    msg += `*🛒 ITENS DO PEDIDO:*\n`;
+    carrinho.forEach(i => msg += `- ${i.nome} (R$ ${i.preco.toFixed(2).replace('.', ',')})\n`);
+    
+    msg += `\n---`;
+    msg += `\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    msg += `\n*Taxa de Entrega:* R$ ${freteValor.toFixed(2).replace('.', ',')}`;
+    msg += `\n*TOTAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+
+    window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
 }
 
 window.onload = carregarDados;
