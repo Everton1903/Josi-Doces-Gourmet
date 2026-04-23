@@ -85,6 +85,7 @@
         }
 
         .item-carrinho { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; font-size: 14px; }
+        .item-frete { color: #8d6e63; font-style: italic; border-top: 1px dashed #d7ccc8; margin-top: 5px; }
         .remover { color: red; cursor: pointer; font-weight: bold; margin-left: 10px; }
         #resumo { margin-top: 15px; font-size: 18px; text-align: center; color: #5d4037; border-top: 2px solid #eee; padding-top: 10px; }
     </style>
@@ -308,17 +309,25 @@ function validarTudo() {
 }
 
 function atualizar() {
-    const frete = parseFloat(document.getElementById("bairro").value);
+    const selectBairro = document.getElementById("bairro");
+    const frete = parseFloat(selectBairro.value);
+    const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
+    
     const subtotal = carrinho.reduce((acc, item) => acc + item.preco, 0);
     const total = subtotal + frete;
-    document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     
     const listaDiv = document.getElementById("itensCarrinhoLista");
     listaDiv.innerHTML = "";
+    
+    // Lista os produtos
     carrinho.forEach((item, index) => {
-        listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.nome}</span> <span>R$ ${item.preco.toFixed(2)} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
+        listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.nome}</span> <span>R$ ${item.preco.toFixed(2).replace('.', ',')} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
     });
 
+    // Adiciona linha do frete/entrega
+    listaDiv.innerHTML += `<div class="item-carrinho item-frete"><span>🚚 ${bairroTexto}</span> <span>R$ ${frete.toFixed(2).replace('.', ',')}</span></div>`;
+
+    document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     document.getElementById("secaoDadosPedido").style.display = carrinho.length > 0 ? "block" : "none";
     document.getElementById("btnToggle").style.display = carrinho.length > 0 ? "flex" : "none";
     return total;
@@ -333,9 +342,13 @@ function resetPagamentoFluxo() {
 function verificarPgto() {
     const pag = document.getElementById("pagamento").value;
     const btnZap = document.getElementById("btnWhatsapp");
+    
+    atualizar();
+
     document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
     document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
     document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
+    
     if (pag === "Pix") {
         btnZap.disabled = !pixGerado;
         btnZap.innerText = pixGerado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Gere o Pix primeiro";
@@ -343,19 +356,24 @@ function verificarPgto() {
         btnZap.disabled = !cartaoIniciado;
         btnZap.innerText = cartaoIniciado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Pague no Cartão primeiro";
     }
-    atualizar();
 }
 
 function add(n, p) { 
     carrinho.push({nome: n, preco: p}); 
-    resetPagamentoFluxo(); salvarDados(); 
+    salvarDados(); 
+    resetPagamentoFluxo();
     if(document.getElementById("carrinhoBox").style.display !== "block") toggleVisibilidadeCarrinho();
 }
 
-function remover(index) { carrinho.splice(index, 1); resetPagamentoFluxo(); salvarDados(); }
+function remover(index) { 
+    carrinho.splice(index, 1); 
+    salvarDados(); 
+    resetPagamentoFluxo(); 
+}
 
 function alternarEndereco() { 
     document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "0") ? "none" : "block"; 
+    verificarPgto();
 }
 
 function copiarValorNumerico() { if (!validarTudo()) return; navigator.clipboard.writeText(atualizar().toFixed(2)); alert("✅ Valor copiado!"); }
@@ -390,7 +408,6 @@ function gerarPixReal() {
 
 function abrirMercadoPago() { if (!validarTudo()) return; cartaoIniciado = true; verificarPgto(); window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank"); }
 
-// FUNÇÃO ATUALIZADA PARA O WHATSAPP COM TODAS AS INFORMAÇÕES
 function finalizarZap() {
     if (!validarTudo()) return;
 
