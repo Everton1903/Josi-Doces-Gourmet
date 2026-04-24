@@ -43,6 +43,7 @@
         .btn-pix { background: #5d4037; padding: 10px; font-size: 14px; }
         .btn-copy-total { background: #8d6e63; margin-bottom: 5px; padding: 10px; font-size: 14px; }
         .btn-mp { background: #009ee3; padding: 10px; font-size: 14px; }
+        .btn-limpar { background: #e74c3c; padding: 8px; font-size: 12px; margin-top: 10px; opacity: 0.8; }
         
         #secaoDadosPedido { display: none; margin-top: 30px; border-top: 2px dashed #d7ccc8; padding-top: 10px; }
 
@@ -148,19 +149,19 @@
     <div id="secaoDadosPedido">
         <label>👤 Seus Dados</label>
         <input type="text" id="nome" placeholder="Seu Nome Completo" oninput="salvarDados()">
-        <input type="tel" id="telefone" placeholder="(00) 00000-0000" maxlength="15" oninput="mascaraTelefone(this); salvarDados();">
+        <input type="tel" id="telefone" placeholder="(51) 99999-9999" maxlength="15" oninput="mascaraTelefone(this); salvarDados();">
         
         <label>🚚 Entrega e Região</label>
         <select id="bairro" onchange="alternarEndereco(); salvarDados();">
             <option value="0">Vou retirar no local (R$ 0,00)</option>
-            <option value="8">Centro (R$ 8,00)</option>
-            <option value="12">Acesso Dona Leopoldina / Parque (R$ 12,00)</option>
-            <option value="12">Cidade Nova (R$ 12,00)</option>
-            <option value="8">Cruzeiro (R$ 8,00)</option>
-            <option value="15">Gressler (R$ 15,00)</option>
+            <option value="5">Centro (R$ 5,00)</option>
+            <option value="10">Acesso Dona Leopoldina / Parque (R$ 10,00)</option>
+            <option value="10">Cidade Nova (R$ 10,00)</option>
+            <option value="5">Cruzeiro (R$ 5,00)</option>
+            <option value="10">Gressler (R$ 10,00)</option>
             <option value="30">Interior / Outros (R$ 30,00)</option>
-            <option value="5">Coronel Brito (R$ 5,00)</option>
-            <option value="15">Santa Tecla (R$ 15,00)</option>
+            <option value="00">Coronel Brito (R$ 0,00)</option>
+            <option value="10">Santa Tecla (R$ 10,00)</option>
         </select>
 
         <div id="blocoEndereco">
@@ -190,6 +191,8 @@
     <h3 style="margin-top:0; color:#5d4037;">🛒 Seu Pedido</h3>
     
     <div id="itensCarrinhoLista"></div>
+    <button class="btn-limpar" onclick="limparCarrinhoCompleto()">🗑️ Esvaziar Carrinho</button>
+    
     <div id="resumo"><b>Total: R$ 0,00</b></div>
 
     <div style="margin-top:15px;">
@@ -253,6 +256,7 @@ function salvarDados() {
 
 function carregarDados() {
     const salvo = localStorage.getItem('pedidoJosiDoces');
+    const hoje = new Date().toISOString().split("T")[0];
     if (salvo) {
         const d = JSON.parse(salvo);
         document.getElementById("nome").value = d.nome || "";
@@ -261,16 +265,15 @@ function carregarDados() {
         document.getElementById("endereco").value = d.endereco || "";
         document.getElementById("pagamento").value = d.pagamento || "Pix";
         carrinho = d.carrinho || [];
-        const hoje = new Date().toISOString().split("T")[0];
         document.getElementById('dataAgendamento').value = (d.data >= hoje) ? d.data : hoje;
         document.getElementById('horaAgendamento').value = d.hora || "08:00";
         alternarEndereco();
         verificarPgto();
     } else {
-        document.getElementById('dataAgendamento').value = new Date().toISOString().split("T")[0];
+        document.getElementById('dataAgendamento').value = hoje;
         document.getElementById('horaAgendamento').value = "08:00";
     }
-    document.getElementById('dataAgendamento').min = new Date().toISOString().split("T")[0];
+    document.getElementById('dataAgendamento').min = hoje;
 }
 
 function validarTudo() {
@@ -280,11 +283,32 @@ function validarTudo() {
     const horaInput = document.getElementById('horaAgendamento').value;
     const bairro = document.getElementById("bairro").value;
     const endereco = document.getElementById("endereco").value.trim();
+    
+    const agora = new Date();
+    const hoje = agora.toISOString().split("T")[0];
+    const horaAgora = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
 
     if (!nome) { alert("⚠️ Informe seu nome."); return false; }
-    if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
+    
+    // VALIDAÇÃO DE WHATSAPP (Mínimo 10 dígitos, começando com 9 após o DDD)
+    // Se tiver 10 dígitos: DDD (2) + Número (8). Ex: 5198887777 -> o 3º dígito deve ser 9
+    // Se tiver 11 dígitos: DDD (2) + Número (9). Ex: 51998887777 -> o 3º dígito deve ser 9
+    const ddd = telRaw.substring(0, 2);
+    const numeroSemDDD = telRaw.substring(2);
+
+    if (telRaw.length < 10 || telRaw.length > 11 || numeroSemDDD.charAt(0) !== '9') { 
+        alert("⚠️ Informe um WhatsApp válido com DDD.\nO número deve começar obrigatoriamente com 9."); 
+        return false; 
+    }
+    
     if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
     if (!dataInput || !horaInput) { alert("⚠️ Selecione data e hora."); return false; }
+    if (dataInput < hoje) { alert("⚠️ A data selecionada já passou!"); return false; }
+    if (dataInput === hoje && horaInput <= horaAgora) {
+        alert("⚠️ O horário selecionado já passou! Escolha um horário futuro.");
+        return false;
+    }
+    
     if (bairro !== "0" && !endereco) { alert("⚠️ Informe o endereço de entrega."); return false; }
     
     const [ano, mes, dia] = dataInput.split('-');
@@ -312,25 +336,30 @@ function atualizar() {
     const selectBairro = document.getElementById("bairro");
     const frete = parseFloat(selectBairro.value);
     const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
-    
-    const subtotal = carrinho.reduce((acc, item) => acc + item.preco, 0);
+    const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     const total = subtotal + frete;
-    
     const listaDiv = document.getElementById("itensCarrinhoLista");
     listaDiv.innerHTML = "";
     
-    // Lista os produtos
     carrinho.forEach((item, index) => {
-        listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.nome}</span> <span>R$ ${item.preco.toFixed(2).replace('.', ',')} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
+        const precoTotalItem = item.preco * (item.qtd || 1);
+        listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.qtd > 1 ? item.qtd + 'x ' : ''}${item.nome}</span> <span>R$ ${precoTotalItem.toFixed(2).replace('.', ',')} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
     });
 
-    // Adiciona linha do frete/entrega
     listaDiv.innerHTML += `<div class="item-carrinho item-frete"><span>🚚 ${bairroTexto}</span> <span>R$ ${frete.toFixed(2).replace('.', ',')}</span></div>`;
-
     document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     document.getElementById("secaoDadosPedido").style.display = carrinho.length > 0 ? "block" : "none";
     document.getElementById("btnToggle").style.display = carrinho.length > 0 ? "flex" : "none";
     return total;
+}
+
+function limparCarrinhoCompleto() {
+    if(confirm("Tem certeza que deseja esvaziar o carrinho?")) {
+        carrinho = [];
+        salvarDados();
+        resetPagamentoFluxo();
+        if(document.getElementById("carrinhoBox").style.display === "block") toggleVisibilidadeCarrinho();
+    }
 }
 
 function resetPagamentoFluxo() { 
@@ -342,9 +371,7 @@ function resetPagamentoFluxo() {
 function verificarPgto() {
     const pag = document.getElementById("pagamento").value;
     const btnZap = document.getElementById("btnWhatsapp");
-    
     atualizar();
-
     document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
     document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
     document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
@@ -359,14 +386,17 @@ function verificarPgto() {
 }
 
 function add(n, p) { 
-    carrinho.push({nome: n, preco: p}); 
+    const itemExistente = carrinho.find(item => item.nome === n);
+    if (itemExistente) { itemExistente.qtd = (itemExistente.qtd || 1) + 1; } 
+    else { carrinho.push({nome: n, preco: p, qtd: 1}); }
     salvarDados(); 
     resetPagamentoFluxo();
     if(document.getElementById("carrinhoBox").style.display !== "block") toggleVisibilidadeCarrinho();
 }
 
 function remover(index) { 
-    carrinho.splice(index, 1); 
+    if (carrinho[index].qtd > 1) { carrinho[index].qtd -= 1; } 
+    else { carrinho.splice(index, 1); }
     salvarDados(); 
     resetPagamentoFluxo(); 
 }
@@ -377,7 +407,6 @@ function alternarEndereco() {
 }
 
 function copiarValorNumerico() { if (!validarTudo()) return; navigator.clipboard.writeText(atualizar().toFixed(2)); alert("✅ Valor copiado!"); }
-
 function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("✅ Código Pix Copiado!"); }
 
 function fv(id, v) { return id + v.length.toString().padStart(2, '0') + v; }
@@ -410,7 +439,6 @@ function abrirMercadoPago() { if (!validarTudo()) return; cartaoIniciado = true;
 
 function finalizarZap() {
     if (!validarTudo()) return;
-
     const nome = document.getElementById("nome").value;
     const telefone = document.getElementById("telefone").value;
     const data = document.getElementById('dataAgendamento').value.split('-').reverse().join('/');
@@ -420,8 +448,7 @@ function finalizarZap() {
     const bairroNome = selectBairro.options[selectBairro.selectedIndex].text;
     const freteValor = parseFloat(selectBairro.value);
     const endereco = document.getElementById("endereco").value;
-    
-    let subtotal = carrinho.reduce((acc, item) => acc + item.preco, 0);
+    let subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     let totalGeral = subtotal + freteValor;
 
     let msg = `*🍮 NOVO PEDIDO - JOSI DOCES*\n\n`;
@@ -429,25 +456,23 @@ function finalizarZap() {
     msg += `*📞 CONTATO:* ${telefone}\n`;
     msg += `*🗓️ ENTREGA/RETIRADA:* ${data} às ${hora}\n`;
     msg += `*💳 PAGAMENTO:* ${formaPgto}\n\n`;
-    
     msg += `*📍 LOCAL:* ${bairroNome}\n`;
-    if(freteValor > 0) {
-        msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`;
-    } else {
-        msg += `\n`;
-    }
-
+    if(freteValor > 0) { msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`; } else { msg += `\n`; }
     msg += `*🛒 ITENS DO PEDIDO:*\n`;
-    carrinho.forEach(i => msg += `- ${i.nome} (R$ ${i.preco.toFixed(2).replace('.', ',')})\n`);
-    
-    msg += `\n---`;
-    msg += `\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-    msg += `\n*Taxa de Entrega:* R$ ${freteValor.toFixed(2).replace('.', ',')}`;
-    msg += `\n*TOTAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+    carrinho.forEach(i => {
+        const precoTotalItem = i.preco * (i.qtd || 1);
+        msg += `- ${i.qtd > 1 ? i.qtd + 'x ' : ''}${i.nome} (R$ ${precoTotalItem.toFixed(2).replace('.', ',')})\n`;
+    });
+    msg += `\n---\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n*Taxa:* R$ ${freteValor.toFixed(2).replace('.', ',')}\n*TOTAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 
     window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
-}
 
+    setTimeout(() => {
+        carrinho = []; salvarDados(); resetPagamentoFluxo();
+        if(document.getElementById("carrinhoBox").style.display === "block") toggleVisibilidadeCarrinho();
+        alert("✅ Pedido enviado! O carrinho foi limpo.");
+    }, 1000);
+}
 window.onload = carregarDados;
 </script>
 </body>
