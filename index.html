@@ -33,6 +33,19 @@
         label { display: block; margin-top: 20px; font-weight: bold; color: #5d4037; font-size: 15px; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: 1px solid #d7ccc8; box-sizing: border-box; background: white; font-size: 16px; }
 
+        .card-evento {
+            background: linear-gradient(135deg, #8d6e63, #5d4037);
+            color: white; padding: 20px; border-radius: 15px; text-align: center;
+            margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 2px solid #d7ccc8;
+        }
+        .card-evento h3 { margin-top: 0; color: #fdf5e6; }
+        .btn-evento {
+            background: #fdf5e6; color: #5d4037; border: none; padding: 10px 20px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;
+            display: inline-block; text-decoration: none; transition: 0.3s;
+        }
+
         .card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #d7ccc8; }
         .price { color: #8d6e63; font-weight: bold; font-size: 1.3em; margin: 10px 0; }
         button { color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; font-size: 16px; }
@@ -95,13 +108,14 @@
 
 <div id="modalAviso" class="modal-aviso" style="display: block;">
     <div class="modal-conteudo">
-        <h2>⚠️ Horários de Encomendas</h2>
-        <p>Confira nossos turnos para agendamento:</p>
+        <h2>⚠️ Horários de Funcionamento</h2>
+        <p>Para que os pedidos sejam feitos, você precisa está dentro desses horários, será possível agendamento para o mesmo dia e datas futuras: Confira!!</p>
         <ul style="text-align: left; font-size: 14px; color: #555;">
-            <li>🗓️ <b>Segunda a Sexta:</b> Apenas no turno da <b>MANHÃ</b> (08h às 12h).</li>
-            <li>🚀 <b>Sábados, Domingos e Feriados:</b> Liberado o <b>DIA TODO</b> (08h às 17h).</li>
+            <li>🗓️ <b>Segunda a Sexta:</b><br>Pedidos dás 08h às 12h. Retiradas até as 17h.</li>
+            <li>🚀 <b>Sáb, Dom e Feriados:</b><br>Pedidos dás 08h às 17h.</li>
+            <li>⏰ <b>Atenção:</b> Pedidos para o mesmo dia precisam de 1h de antecedência.</li>
         </ul>
-        <a href="https://wa.me/5551985803243?text=Olá, tenho uma dúvida sobre o agendamento" target="_blank" class="btn-duvida">💬 Dúvidas no WhatsApp</a>
+        <a href="https://wa.me/5551985803243?text=Olá Josi! Tenho uma dúvida sobre os horários." target="_blank" class="btn-duvida">💬 Dúvidas no WhatsApp</a>
         <button class="btn-entendi" onclick="abrirCardapioVisual()">Ver Cardápio</button>
     </div>
 </div>
@@ -136,6 +150,14 @@
 </header>
 
 <div class="container">
+    
+    <div class="card-evento">
+        <h3>✨ Encomendas para Eventos</h3>
+        <p>Vai fazer uma festa? Temos condições especiais para grandes quantidades!</p>
+        <a href="https://wa.me/5551985803243?text=Olá Josi! Gostaria de um orçamento para um evento/festa." 
+           target="_blank" class="btn-evento">Solicitar Orçamento Especial</a>
+    </div>
+
     <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p><button class="btn-add" onclick="add('Torta de Bolacha (1Kg)', 55)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Torta de Bolacha Pequena (250g)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Bolacha Pequena', 10)">Adicionar ao Carrinho</button></div>
     <div class="card"><h3>Torta de Bolacha Grande (300g)</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Torta de Bolacha Grande', 12)">Adicionar ao Carrinho</button></div>
@@ -169,7 +191,7 @@
             <textarea id="endereco" placeholder="Rua, número e referência" oninput="salvarDados()"></textarea>
         </div>
 
-        <label>⏰ Agendamento (Seg-Sex apenas Manhã)</label>
+        <label>⏰ Data e Horário de Recebimento</label>
         <div style="display:flex; gap:5px;">
             <input type="date" id="dataAgendamento" onchange="resetPagamentoFluxo(); salvarDados();">
             <input type="time" id="horaAgendamento" onchange="resetPagamentoFluxo(); salvarDados();">
@@ -286,49 +308,58 @@ function validarTudo() {
     
     const agora = new Date();
     const hoje = agora.toISOString().split("T")[0];
-    const horaAgora = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
+    const horaAtualStr = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
+    
+    const diaSemanaAtual = agora.getDay(); 
+    const feriados = ["01-01", "04-21", "05-01", "09-07", "10-12", "11-02", "11-15", "12-25"];
+    const hojeMMDD = (agora.getMonth() + 1).toString().padStart(2, '0') + "-" + agora.getDate().toString().padStart(2, '0');
+    const isFeriadoHoje = feriados.includes(hojeMMDD);
 
-    if (!nome) { alert("⚠️ Informe seu nome."); return false; }
-    
-    // VALIDAÇÃO DE WHATSAPP (Mínimo 10 dígitos, começando com 9 após o DDD)
-    // Se tiver 10 dígitos: DDD (2) + Número (8). Ex: 5198887777 -> o 3º dígito deve ser 9
-    // Se tiver 11 dígitos: DDD (2) + Número (9). Ex: 51998887777 -> o 3º dígito deve ser 9
-    const ddd = telRaw.substring(0, 2);
-    const numeroSemDDD = telRaw.substring(2);
-
-    if (telRaw.length < 10 || telRaw.length > 11 || numeroSemDDD.charAt(0) !== '9') { 
-        alert("⚠️ Informe um WhatsApp válido com DDD.\nO número deve começar obrigatoriamente com 9."); 
-        return false; 
-    }
-    
-    if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
-    if (!dataInput || !horaInput) { alert("⚠️ Selecione data e hora."); return false; }
-    if (dataInput < hoje) { alert("⚠️ A data selecionada já passou!"); return false; }
-    if (dataInput === hoje && horaInput <= horaAgora) {
-        alert("⚠️ O horário selecionado já passou! Escolha um horário futuro.");
-        return false;
-    }
-    
-    if (bairro !== "0" && !endereco) { alert("⚠️ Informe o endereço de entrega."); return false; }
-    
-    const [ano, mes, dia] = dataInput.split('-');
-    const dt = new Date(ano, mes - 1, dia);
-    const diaSemana = dt.getDay(); 
-    const feriados = ['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '12-25'];
-    const isFeriado = feriados.includes(`${mes}-${dia}`);
-
-    if (diaSemana >= 1 && diaSemana <= 5 && !isFeriado) {
-        if (horaInput > "12:00") {
-            alert("⚠️ De segunda a sexta-feira, só aceitamos encomendas para o turno da MANHÃ (até as 12:00).");
+    // REGRA 1: MOMENTO DO PEDIDO (HORA DO RELÓGIO)
+    if (diaSemanaAtual >= 1 && diaSemanaAtual <= 5 && !isFeriadoHoje) {
+        if (horaAtualStr < "08:00" || horaAtualStr > "12:00") {
+            alert("⚠️ Durante a semana, os pedidos devem ser realizados das 08:00 às 12:00.");
+            return false;
+        }
+    } else {
+        if (horaAtualStr < "08:00" || horaAtualStr > "17:00") {
+            alert("⚠️ Nos finais de semana e feriados, os pedidos devem ser realizados das 08:00 às 17:00.");
             return false;
         }
     }
 
+    if (!nome) { alert("⚠️ Informe seu nome."); return false; }
+    if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
+    if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
+    
+    // REGRA 2: VALIDAÇÃO DA DATA DE AGENDAMENTO
+    if (dataInput < hoje) { alert("⚠️ A data de retirada não pode ser no passado."); return false; }
+    
+    // REGRA 3: ANTECEDÊNCIA DE 1 HORA (SOMENTE SE FOR PARA HOJE)
+    if (dataInput === hoje) {
+        const [h, m] = horaInput.split(':');
+        const dataAgendada = new Date();
+        dataAgendada.setHours(h, m, 0, 0);
+
+        // Limite mínimo = Agora + 1 hora
+        const limiteMinimo = new Date(agora.getTime() + (60 * 60 * 1000)); 
+
+        if (dataAgendada < limiteMinimo) {
+            const hMin = limiteMinimo.getHours().toString().padStart(2, '0');
+            const mMin = limiteMinimo.getMinutes().toString().padStart(2, '0');
+            alert(`⚠️ Para hoje, precisamos de no mínimo 1h de antecedência para preparar seu pedido. Por favor, escolha um horário após as ${hMin}:${mMin}.`);
+            return false;
+        }
+    }
+    
+    // REGRA 4: HORÁRIO DE RETIRADA PERMITIDO (08h às 17h sempre)
     if (horaInput < "08:00" || horaInput > "17:00") {
-        alert("⚠️ Nosso horário de atendimento é das 08:00 às 17:00.");
+        alert("⚠️ O horário para retirada/entrega deve ser entre 08:00 e 17:00.");
         return false;
     }
-
+    
+    if (bairro !== "0" && !endereco) { alert("⚠️ Informe o endereço para entrega."); return false; }
+    
     return true;
 }
 
@@ -445,8 +476,9 @@ function finalizarZap() {
     const hora = document.getElementById('horaAgendamento').value;
     const formaPgto = document.getElementById("pagamento").value;
     const selectBairro = document.getElementById("bairro");
+    const bairroValor = selectBairro.value; 
     const bairroNome = selectBairro.options[selectBairro.selectedIndex].text;
-    const freteValor = parseFloat(selectBairro.value);
+    const freteValor = parseFloat(bairroValor);
     const endereco = document.getElementById("endereco").value;
     let subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     let totalGeral = subtotal + freteValor;
@@ -454,10 +486,16 @@ function finalizarZap() {
     let msg = `*🍮 NOVO PEDIDO - JOSI DOCES*\n\n`;
     msg += `*👤 CLIENTE:* ${nome}\n`;
     msg += `*📞 CONTATO:* ${telefone}\n`;
-    msg += `*🗓️ ENTREGA/RETIRADA:* ${data} às ${hora}\n`;
+    msg += `*🗓️ DATA DESEJADA:* ${data} às ${hora}\n`;
     msg += `*💳 PAGAMENTO:* ${formaPgto}\n\n`;
+    
     msg += `*📍 LOCAL:* ${bairroNome}\n`;
-    if(freteValor > 0) { msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`; } else { msg += `\n`; }
+    if(bairroValor !== "0") { 
+        msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`; 
+    } else { 
+        msg += `*🏪 OPÇÃO:* Retirada no local\n\n`; 
+    }
+
     msg += `*🛒 ITENS DO PEDIDO:*\n`;
     carrinho.forEach(i => {
         const precoTotalItem = i.preco * (i.qtd || 1);
