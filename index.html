@@ -102,9 +102,31 @@
         .item-frete { color: #8d6e63; font-style: italic; border-top: 1px dashed #d7ccc8; margin-top: 5px; }
         .remover { color: red; cursor: pointer; font-weight: bold; margin-left: 10px; }
         #resumo { margin-top: 15px; font-size: 18px; text-align: center; color: #5d4037; border-top: 2px solid #eee; padding-top: 10px; }
+
+        /* Estilo do Banner Flutuante */
+        .banner-promo {
+            position: fixed; top: 20px; right: 20px; background: #e67e22; color: white;
+            padding: 12px; border-radius: 12px; z-index: 999; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #fff;
+            max-width: 150px; text-align: center; animation: pulse 2s infinite;
+        }
+        .banner-promo h4 { margin: 0; font-size: 14px; }
+        .banner-promo p { margin: 4px 0 0; font-size: 11px; font-weight: bold; background: white; color: #e67e22; border-radius: 5px; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
+
+<div id="bannerPromo" class="banner-promo" onclick="addPromoCombo()">
+    <h4>🔥 PROMOÇÃO!</h4>
+    <span> Bolo no Pote + Torta Pequena de Ninho</span>
+    <p>POR R$ 20,00 + Frete Grátis</p>
+</div>
 
 <div id="modalAviso" class="modal-aviso" style="display: block;">
     <div class="modal-conteudo">
@@ -233,6 +255,13 @@
 </div>
 
 <script>
+// Nova função para a promoção
+function addPromoCombo() {
+    add('Combo Promo: 2x Bolos de Pote', 20);
+    document.getElementById('bannerPromo').style.display = 'none';
+    alert("🔥 Promoção Adicionada ao Carrinho!");
+}
+
 function abrirCardapioVisual() {
     document.getElementById("modalAviso").style.display = "none";
     document.getElementById("modalCardapio").style.display = "block";
@@ -315,7 +344,6 @@ function validarTudo() {
     const hojeMMDD = (agora.getMonth() + 1).toString().padStart(2, '0') + "-" + agora.getDate().toString().padStart(2, '0');
     const isFeriadoHoje = feriados.includes(hojeMMDD);
 
-    // REGRA 1: MOMENTO DO PEDIDO (HORA DO RELÓGIO)
     if (diaSemanaAtual >= 1 && diaSemanaAtual <= 5 && !isFeriadoHoje) {
         if (horaAtualStr < "08:00" || horaAtualStr > "12:00") {
             alert("⚠️ Durante a semana, os pedidos devem ser realizados das 08:00 às 12:00.");
@@ -332,16 +360,12 @@ function validarTudo() {
     if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
     if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
     
-    // REGRA 2: VALIDAÇÃO DA DATA DE AGENDAMENTO
     if (dataInput < hoje) { alert("⚠️ A data de retirada não pode ser no passado."); return false; }
     
-    // REGRA 3: ANTECEDÊNCIA DE 1 HORA (SOMENTE SE FOR PARA HOJE)
     if (dataInput === hoje) {
         const [h, m] = horaInput.split(':');
         const dataAgendada = new Date();
         dataAgendada.setHours(h, m, 0, 0);
-
-        // Limite mínimo = Agora + 1 hora
         const limiteMinimo = new Date(agora.getTime() + (60 * 60 * 1000)); 
 
         if (dataAgendada < limiteMinimo) {
@@ -352,7 +376,6 @@ function validarTudo() {
         }
     }
     
-    // REGRA 4: HORÁRIO DE RETIRADA PERMITIDO (08h às 17h sempre)
     if (horaInput < "08:00" || horaInput > "17:00") {
         alert("⚠️ O horário para retirada/entrega deve ser entre 08:00 e 17:00.");
         return false;
