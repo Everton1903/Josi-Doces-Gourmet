@@ -197,7 +197,7 @@
         
         <label>🚚 Entrega e Região</label>
         <select id="bairro" onchange="alternarEndereco(); salvarDados();">
-            <option value="0">Vou retirar no local (R$ 0,00)</option>
+            <option value="retirada">Vou retirar no local (R$ 0,00)</option>
             <option value="5">Centro (R$ 5,00)</option>
             <option value="10">Acesso Dona Leopoldina / Parque (R$ 10,00)</option>
             <option value="10">Cidade Nova (R$ 10,00)</option>
@@ -317,7 +317,7 @@ function carregarDados() {
         const d = JSON.parse(salvo);
         document.getElementById("nome").value = d.nome || "";
         document.getElementById("telefone").value = d.telefone || "";
-        document.getElementById("bairro").value = d.bairro || "0";
+        document.getElementById("bairro").value = d.bairro || "retirada";
         document.getElementById("endereco").value = d.endereco || "";
         document.getElementById("pagamento").value = d.pagamento || "Pix";
         carrinho = d.carrinho || [];
@@ -389,16 +389,17 @@ function validarTudo() {
         return false;
     }
     
-    if (bairro !== "0" && !endereco) { alert("⚠️ Informe o endereço para entrega."); return false; }
+    if (bairro !== "retirada" && !endereco) { alert("⚠️ Informe o endereço para entrega."); return false; }
     
     return true;
 }
 
 function atualizar() {
     const selectBairro = document.getElementById("bairro");
+    const valorBairro = selectBairro.value;
     
-    // LOGICA DO FRETE GRATIS: Se promoAtiva for true, frete vira 0
-    let frete = promoAtiva ? 0 : parseFloat(selectBairro.value);
+    // LOGICA DO FRETE GRATIS: Se promoAtiva for true, frete vira 0, senão pega o valor numérico (exceto 'retirada')
+    let frete = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
     
     const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
     const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
@@ -469,8 +470,6 @@ function add(n, p) {
 function remover(index) { 
     if (carrinho[index].qtd > 1) { carrinho[index].qtd -= 1; } 
     else { 
-        // Se remover o item da promo, o frete volta ao normal? (Opcional)
-        // Aqui mantemos simples: se esvaziar tudo, reseta a promo.
         carrinho.splice(index, 1); 
         if(carrinho.length === 0) {
             promoAtiva = false;
@@ -482,7 +481,8 @@ function remover(index) {
 }
 
 function alternarEndereco() { 
-    document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "0") ? "none" : "block"; 
+    // AJUSTE REALIZADO AQUI: Mostra o endereço se não for "retirada"
+    document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "retirada") ? "none" : "block"; 
     verificarPgto();
 }
 
@@ -525,9 +525,9 @@ function finalizarZap() {
     const hora = document.getElementById('horaAgendamento').value;
     const formaPgto = document.getElementById("pagamento").value;
     const selectBairro = document.getElementById("bairro");
+    const valorBairro = selectBairro.value;
     
-    // AQUI TAMBÉM NO WHATSAPP:
-    const freteValor = promoAtiva ? 0 : parseFloat(selectBairro.value);
+    const freteValor = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
     
     const bairroNome = selectBairro.options[selectBairro.selectedIndex].text;
     const endereco = document.getElementById("endereco").value;
@@ -541,7 +541,7 @@ function finalizarZap() {
     msg += `*💳 PAGAMENTO:* ${formaPgto}\n\n`;
     
     msg += `*📍 LOCAL:* ${bairroNome}\n`;
-    if(selectBairro.value !== "0") { 
+    if(valorBairro !== "retirada") { 
         msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`; 
     } else { 
         msg += `*🏪 OPÇÃO:* Retirada no local\n\n`; 
