@@ -125,7 +125,7 @@
 <div id="bannerPromo" class="banner-promo" onclick="addPromoCombo()">
     <h4>🔥 PROMOÇÃO!</h4>
     <span> Bolo no Pote + Torta Pequena de Ninho</span>
-    <p>POR R$ 20,00 + Frete Grátis</p>
+    <p>POR R$ 20,00 + FRETE GRÁTIS</p>
 </div>
 
 <div id="modalAviso" class="modal-aviso" style="display: block;">
@@ -204,7 +204,7 @@
             <option value="5">Cruzeiro (R$ 5,00)</option>
             <option value="10">Gressler (R$ 10,00)</option>
             <option value="30">Interior / Outros (R$ 30,00)</option>
-            <option value="00">Coronel Brito (R$ 0,00)</option>
+            <option value="0">Coronel Brito (R$ 0,00)</option>
             <option value="10">Santa Tecla (R$ 10,00)</option>
         </select>
 
@@ -255,11 +255,15 @@
 </div>
 
 <script>
-// Nova função para a promoção
+// Variável para controlar a promoção de frete grátis
+let promoAtiva = false;
+
 function addPromoCombo() {
-    add('Combo Promo: 2x Bolos de Pote', 20);
+    promoAtiva = true; // Ativa o frete grátis
+    add('Combo Promo: Bolo no Pote + Torta Ninho', 20);
     document.getElementById('bannerPromo').style.display = 'none';
-    alert("🔥 Promoção Adicionada ao Carrinho!");
+    alert("🔥 Promoção Adicionada! Você ganhou FRETE GRÁTIS neste pedido.");
+    verificarPgto(); // Atualiza o resumo
 }
 
 function abrirCardapioVisual() {
@@ -300,7 +304,8 @@ function salvarDados() {
         data: document.getElementById('dataAgendamento').value,
         hora: document.getElementById('horaAgendamento').value,
         pagamento: document.getElementById("pagamento").value,
-        carrinho: carrinho
+        carrinho: carrinho,
+        promoAtiva: promoAtiva
     };
     localStorage.setItem('pedidoJosiDoces', JSON.stringify(dados));
 }
@@ -316,6 +321,9 @@ function carregarDados() {
         document.getElementById("endereco").value = d.endereco || "";
         document.getElementById("pagamento").value = d.pagamento || "Pix";
         carrinho = d.carrinho || [];
+        promoAtiva = d.promoAtiva || false;
+        if(promoAtiva) document.getElementById('bannerPromo').style.display = 'none';
+        
         document.getElementById('dataAgendamento').value = (d.data >= hoje) ? d.data : hoje;
         document.getElementById('horaAgendamento').value = d.hora || "08:00";
         alternarEndereco();
@@ -388,7 +396,10 @@ function validarTudo() {
 
 function atualizar() {
     const selectBairro = document.getElementById("bairro");
-    const frete = parseFloat(selectBairro.value);
+    
+    // LOGICA DO FRETE GRATIS: Se promoAtiva for true, frete vira 0
+    let frete = promoAtiva ? 0 : parseFloat(selectBairro.value);
+    
     const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
     const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     const total = subtotal + frete;
@@ -400,7 +411,12 @@ function atualizar() {
         listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.qtd > 1 ? item.qtd + 'x ' : ''}${item.nome}</span> <span>R$ ${precoTotalItem.toFixed(2).replace('.', ',')} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
     });
 
-    listaDiv.innerHTML += `<div class="item-carrinho item-frete"><span>🚚 ${bairroTexto}</span> <span>R$ ${frete.toFixed(2).replace('.', ',')}</span></div>`;
+    if(promoAtiva) {
+        listaDiv.innerHTML += `<div class="item-carrinho item-frete" style="color: green; font-weight: bold;"><span>🚚 FRETE GRÁTIS (PROMO)</span> <span>R$ 0,00</span></div>`;
+    } else {
+        listaDiv.innerHTML += `<div class="item-carrinho item-frete"><span>🚚 ${bairroTexto}</span> <span>R$ ${frete.toFixed(2).replace('.', ',')}</span></div>`;
+    }
+    
     document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     document.getElementById("secaoDadosPedido").style.display = carrinho.length > 0 ? "block" : "none";
     document.getElementById("btnToggle").style.display = carrinho.length > 0 ? "flex" : "none";
@@ -410,6 +426,8 @@ function atualizar() {
 function limparCarrinhoCompleto() {
     if(confirm("Tem certeza que deseja esvaziar o carrinho?")) {
         carrinho = [];
+        promoAtiva = false; // Reseta a promoção
+        document.getElementById('bannerPromo').style.display = 'block';
         salvarDados();
         resetPagamentoFluxo();
         if(document.getElementById("carrinhoBox").style.display === "block") toggleVisibilidadeCarrinho();
@@ -450,7 +468,15 @@ function add(n, p) {
 
 function remover(index) { 
     if (carrinho[index].qtd > 1) { carrinho[index].qtd -= 1; } 
-    else { carrinho.splice(index, 1); }
+    else { 
+        // Se remover o item da promo, o frete volta ao normal? (Opcional)
+        // Aqui mantemos simples: se esvaziar tudo, reseta a promo.
+        carrinho.splice(index, 1); 
+        if(carrinho.length === 0) {
+            promoAtiva = false;
+            document.getElementById('bannerPromo').style.display = 'block';
+        }
+    }
     salvarDados(); 
     resetPagamentoFluxo(); 
 }
@@ -499,9 +525,11 @@ function finalizarZap() {
     const hora = document.getElementById('horaAgendamento').value;
     const formaPgto = document.getElementById("pagamento").value;
     const selectBairro = document.getElementById("bairro");
-    const bairroValor = selectBairro.value; 
+    
+    // AQUI TAMBÉM NO WHATSAPP:
+    const freteValor = promoAtiva ? 0 : parseFloat(selectBairro.value);
+    
     const bairroNome = selectBairro.options[selectBairro.selectedIndex].text;
-    const freteValor = parseFloat(bairroValor);
     const endereco = document.getElementById("endereco").value;
     let subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     let totalGeral = subtotal + freteValor;
@@ -513,7 +541,7 @@ function finalizarZap() {
     msg += `*💳 PAGAMENTO:* ${formaPgto}\n\n`;
     
     msg += `*📍 LOCAL:* ${bairroNome}\n`;
-    if(bairroValor !== "0") { 
+    if(selectBairro.value !== "0") { 
         msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`; 
     } else { 
         msg += `*🏪 OPÇÃO:* Retirada no local\n\n`; 
@@ -524,12 +552,16 @@ function finalizarZap() {
         const precoTotalItem = i.preco * (i.qtd || 1);
         msg += `- ${i.qtd > 1 ? i.qtd + 'x ' : ''}${i.nome} (R$ ${precoTotalItem.toFixed(2).replace('.', ',')})\n`;
     });
-    msg += `\n---\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n*Taxa:* R$ ${freteValor.toFixed(2).replace('.', ',')}\n*TOTAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+    
+    msg += `\n---\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+    msg += promoAtiva ? `*Taxa:* R$ 0,00 (PROMO FRETE GRÁTIS) ✅\n` : `*Taxa:* R$ ${freteValor.toFixed(2).replace('.', ',')}\n`;
+    msg += `*TOTAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 
     window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
 
     setTimeout(() => {
-        carrinho = []; salvarDados(); resetPagamentoFluxo();
+        carrinho = []; promoAtiva = false; salvarDados(); resetPagamentoFluxo();
+        document.getElementById('bannerPromo').style.display = 'block';
         if(document.getElementById("carrinhoBox").style.display === "block") toggleVisibilidadeCarrinho();
         alert("✅ Pedido enviado! O carrinho foi limpo.");
     }, 1000);
