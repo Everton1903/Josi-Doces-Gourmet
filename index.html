@@ -398,7 +398,6 @@ function atualizar() {
     const selectBairro = document.getElementById("bairro");
     const valorBairro = selectBairro.value;
     
-    // LOGICA DO FRETE GRATIS: Se promoAtiva for true, frete vira 0, senão pega o valor numérico (exceto 'retirada')
     let frete = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
     
     const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
@@ -427,7 +426,7 @@ function atualizar() {
 function limparCarrinhoCompleto() {
     if(confirm("Tem certeza que deseja esvaziar o carrinho?")) {
         carrinho = [];
-        promoAtiva = false; // Reseta a promoção
+        promoAtiva = false; 
         document.getElementById('bannerPromo').style.display = 'block';
         salvarDados();
         resetPagamentoFluxo();
@@ -436,7 +435,8 @@ function limparCarrinhoCompleto() {
 }
 
 function resetPagamentoFluxo() { 
-    pixGerado = false; cartaoIniciado = false; 
+    pixGerado = false; 
+    cartaoIniciado = false; 
     document.getElementById("pixDisplay").style.display = "none"; 
     verificarPgto(); 
 }
@@ -445,6 +445,8 @@ function verificarPgto() {
     const pag = document.getElementById("pagamento").value;
     const btnZap = document.getElementById("btnWhatsapp");
     atualizar();
+    
+    // Controla visibilidade dos botões
     document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
     document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
     document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
@@ -453,8 +455,9 @@ function verificarPgto() {
         btnZap.disabled = !pixGerado;
         btnZap.innerText = pixGerado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Gere o Pix primeiro";
     } else {
-        btnZap.disabled = !cartaoIniciado;
-        btnZap.innerText = cartaoIniciado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Pague no Cartão primeiro";
+        // AJUSTE: Removemos a trava do cartão para permitir que o cliente envie o pedido mesmo que volte ou pague depois
+        btnZap.disabled = false;
+        btnZap.innerText = "✅ Enviar Pedido no WhatsApp";
     }
 }
 
@@ -481,7 +484,6 @@ function remover(index) {
 }
 
 function alternarEndereco() { 
-    // AJUSTE REALIZADO AQUI: Mostra o endereço se não for "retirada"
     document.getElementById("blocoEndereco").style.display = (document.getElementById("bairro").value === "retirada") ? "none" : "block"; 
     verificarPgto();
 }
