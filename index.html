@@ -273,31 +273,21 @@ const CHAVE_PIX = "00431179026";
 const NOME_RECEBEDOR = "JOSI DOCES";
 const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
-// FUNÇÃO ATUALIZADA: Força o cliente a ir para o formulário
 function addPromoCombo() {
     if (!lojaAberta) {
         alert("Olá! Os pedidos estão suspensos no momento. Consulte nossos horários!");
         return;
     }
     promoAtiva = true;
-    
     const jaTemPromo = carrinho.find(item => item.nome === 'FRETE GRÁTIS (Ativado)');
     if (!jaTemPromo) {
         carrinho.push({nome: 'FRETE GRÁTIS (Ativado)', preco: 0, qtd: 1, fixo: true});
     }
-    
     document.getElementById('bannerPromo').style.display = 'none';
-    
-    // Abre o carrinho se estiver fechado
     const box = document.getElementById("carrinhoBox");
-    if (box.style.display === "none" || box.style.display === "") {
-        toggleVisibilidadeCarrinho();
-    }
-
-    // Rola para o formulário e foca no nome
+    if (box.style.display === "none" || box.style.display === "") { toggleVisibilidadeCarrinho(); }
     document.getElementById("secaoDadosPedido").scrollIntoView({ behavior: 'smooth' });
     setTimeout(() => { document.getElementById("nome").focus(); }, 800);
-
     verificarPgto();
     salvarDados();
 }
@@ -352,7 +342,6 @@ function carregarDados() {
         carrinho = d.carrinho || [];
         promoAtiva = d.promoAtiva || false;
         if(promoAtiva) document.getElementById('bannerPromo').style.display = 'none';
-        
         document.getElementById('dataAgendamento').value = (d.data >= hoje) ? d.data : hoje;
         document.getElementById('horaAgendamento').value = d.hora || "08:00";
         alternarEndereco();
@@ -363,10 +352,10 @@ function carregarDados() {
     }
     document.getElementById('dataAgendamento').min = hoje;
 
-    // APLICAR TRAVA VISUAL NOS BOTÕES SE FECHADO
+    // BLOQUEIO VISUAL CASO FECHADO
     if (!lojaAberta) {
         document.querySelectorAll('.btn-add').forEach(btn => {
-            btn.innerHTML = "🔒 Temporariamente Fechado";
+            btn.innerHTML = "🔒 Fechado";
             btn.classList.add('btn-bloqueado');
         });
         const banner = document.getElementById('bannerPromo');
@@ -385,13 +374,11 @@ function validarTudo() {
     const bairro = document.getElementById("bairro").value;
     const endereco = document.getElementById("endereco").value.trim();
     const hoje = new Date().toISOString().split("T")[0];
-    
     if (!nome) { alert("⚠️ Informe seu nome."); return false; }
     if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
     if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
     if (dataInput < hoje) { alert("⚠️ A data não pode ser no passado."); return false; }
     if (bairro !== "retirada" && !endereco) { alert("⚠️ Informe o endereço."); return false; }
-    
     return true;
 }
 
@@ -399,12 +386,10 @@ function atualizar() {
     const selectBairro = document.getElementById("bairro");
     const valorBairro = selectBairro.value;
     let frete = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
-    
     const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     const total = subtotal + frete;
     const listaDiv = document.getElementById("itensCarrinhoLista");
     listaDiv.innerHTML = "";
-    
     carrinho.forEach((item, index) => {
         const precoTotalItem = item.preco * (item.qtd || 1);
         listaDiv.innerHTML += `<div class="item-carrinho">
@@ -413,14 +398,12 @@ function atualizar() {
             <span class="remover" onclick="remover(${index})">×</span></span>
         </div>`;
     });
-
     if(promoAtiva) {
         listaDiv.innerHTML += `<div class="item-carrinho item-frete" style="color: green; font-weight: bold;"><span>🚚 FRETE GRÁTIS ATIVADO</span> <span>R$ 0,00</span></div>`;
     } else {
         const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
         listaDiv.innerHTML += `<div class="item-carrinho item-frete"><span>🚚 ${bairroTexto}</span> <span>R$ ${frete.toFixed(2).replace('.', ',')}</span></div>`;
     }
-    
     document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     document.getElementById("secaoDadosPedido").style.display = carrinho.length > 0 ? "block" : "none";
     document.getElementById("btnToggle").style.display = carrinho.length > 0 ? "flex" : "none";
@@ -435,13 +418,9 @@ function remover(index) {
     if (carrinho[index].qtd > 1) { carrinho[index].qtd -= 1; } 
     else { 
         carrinho.splice(index, 1); 
-        if(carrinho.length === 0) {
-            promoAtiva = false;
-            document.getElementById('bannerPromo').style.display = 'block';
-        }
+        if(carrinho.length === 0) { promoAtiva = false; document.getElementById('bannerPromo').style.display = 'block'; }
     }
-    salvarDados(); 
-    resetPagamentoFluxo(); 
+    salvarDados(); resetPagamentoFluxo(); 
 }
 
 function limparCarrinhoCompleto() {
@@ -453,30 +432,23 @@ function limparCarrinhoCompleto() {
     }
 }
 
-function resetPagamentoFluxo() { 
-    pixGerado = false; 
-    document.getElementById("pixDisplay").style.display = "none"; 
-    verificarPgto(); 
-}
+function resetPagamentoFluxo() { pixGerado = false; document.getElementById("pixDisplay").style.display = "none"; verificarPgto(); }
 
 function verificarPgto() {
     const pag = document.getElementById("pagamento").value;
     const btnZap = document.getElementById("btnWhatsapp");
     atualizar();
-    
     if (!lojaAberta) {
         btnZap.disabled = true;
-        btnZap.innerText = "⚠️ Loja Fechada para Pedidos";
+        btnZap.innerText = "⚠️ Loja Fechada";
         document.getElementById("btnGerarPix").style.display = "none";
         document.getElementById("btnPagarMP").style.display = "none";
         document.getElementById("btnCopiarValor").style.display = "none";
         return;
     }
-
     document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
     document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
     document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
-    
     if (pag === "Pix") {
         btnZap.disabled = !pixGerado;
         btnZap.innerText = pixGerado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Gere o Pix primeiro";
@@ -505,15 +477,12 @@ function alternarEndereco() {
 
 function copiarValorNumerico() { if (!validarTudo()) return; navigator.clipboard.writeText(atualizar().toFixed(2)); alert("✅ Valor copiado!"); }
 function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("✅ Código Pix Copiado!"); }
-
 function fv(id, v) { return id + v.length.toString().padStart(2, '0') + v; }
 function crc16(data) {
     let crc = 0xFFFF;
     for (let i = 0; i < data.length; i++) {
         crc ^= data.charCodeAt(i) << 8;
-        for (let j = 0; j < 8; j++) {
-            if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021; else crc <<= 1;
-        }
+        for (let j = 0; j < 8; j++) { if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021; else crc <<= 1; }
     }
     return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 }
@@ -543,21 +512,13 @@ function finalizarZap() {
     const selectBairro = document.getElementById("bairro");
     const valorBairro = selectBairro.value;
     const freteValor = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
-    
     let subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
-    let msg = `*🍮 NOVO PEDIDO - JOSI DOCES*\n\n`;
-    msg += `*👤 CLIENTE:* ${nome}\n*🗓️ DATA:* ${data} às ${hora}\n*💳 PGTO:* ${formaPgto}\n\n`;
-    msg += `*📍 LOCAL:* ${selectBairro.options[selectBairro.selectedIndex].text}\n`;
+    let msg = `*🍮 NOVO PEDIDO - JOSI DOCES*\n\n*👤 CLIENTE:* ${nome}\n*🗓️ DATA:* ${data} às ${hora}\n*💳 PGTO:* ${formaPgto}\n\n*📍 LOCAL:* ${selectBairro.options[selectBairro.selectedIndex].text}\n`;
     if(valorBairro !== "retirada") msg += `*🏠 ENDEREÇO:* ${document.getElementById("endereco").value}\n\n`;
-
     msg += `*🛒 ITENS:*\n`;
-    carrinho.forEach(i => {
-        if(i.preco > 0) msg += `- ${i.qtd > 1 ? i.qtd + 'x ' : ''}${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`;
-    });
-    
+    carrinho.forEach(i => { if(i.preco > 0) msg += `- ${i.qtd > 1 ? i.qtd + 'x ' : ''}${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`; });
     msg += `\n*TOTAL:* R$ ${(subtotal + freteValor).toFixed(2).replace('.', ',')}`;
     if(promoAtiva) msg += `\n*(Frete Grátis Aplicado)* ✅`;
-
     window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
 }
 window.onload = carregarDados;
