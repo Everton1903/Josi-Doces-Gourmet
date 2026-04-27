@@ -51,6 +51,10 @@
         button { color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; font-size: 16px; }
         
         .btn-add { background: #25D366; } 
+        
+        /* Estilo para Botão de Pedido Bloqueado */
+        .btn-bloqueado { background: #95a5a6 !important; cursor: not-allowed !important; }
+        
         .btn-finalizar { background: #25D366; padding: 10px; font-size: 14px; margin-top: 15px; } 
         .btn-finalizar:disabled { background: #ccc !important; cursor: not-allowed; }
         .btn-pix { background: #5d4037; padding: 10px; font-size: 14px; }
@@ -255,6 +259,12 @@
 </div>
 
 <script>
+// ==========================================
+// CONFIGURAÇÃO DE STATUS DA LOJA
+// ==========================================
+const lojaAberta = false; // Altere para TRUE para liberar as vendas
+// ==========================================
+
 let promoAtiva = false;
 let carrinho = [];
 let pixGerado = false;
@@ -265,6 +275,10 @@ const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
 // FUNÇÃO ATUALIZADA: Força o cliente a ir para o formulário
 function addPromoCombo() {
+    if (!lojaAberta) {
+        alert("Olá! Os pedidos estão suspensos no momento. Consulte nossos horários!");
+        return;
+    }
     promoAtiva = true;
     
     const jaTemPromo = carrinho.find(item => item.nome === 'FRETE GRÁTIS (Ativado)');
@@ -348,18 +362,29 @@ function carregarDados() {
         document.getElementById('horaAgendamento').value = "08:00";
     }
     document.getElementById('dataAgendamento').min = hoje;
+
+    // APLICAR TRAVA VISUAL NOS BOTÕES SE FECHADO
+    if (!lojaAberta) {
+        document.querySelectorAll('.btn-add').forEach(btn => {
+            btn.innerHTML = "🔒 Temporariamente Fechado";
+            btn.classList.add('btn-bloqueado');
+        });
+        const banner = document.getElementById('bannerPromo');
+        if(banner) banner.style.filter = "grayscale(1)";
+    }
 }
 
 function validarTudo() {
+    if (!lojaAberta) {
+        alert("⚠️ Não é possível processar o pedido. A loja está fechada.");
+        return false;
+    }
     const nome = document.getElementById("nome").value.trim();
     const telRaw = document.getElementById("telefone").value.replace(/\D/g, "");
     const dataInput = document.getElementById('dataAgendamento').value;
-    const horaInput = document.getElementById('horaAgendamento').value;
     const bairro = document.getElementById("bairro").value;
     const endereco = document.getElementById("endereco").value.trim();
-    
-    const agora = new Date();
-    const hoje = agora.toISOString().split("T")[0];
+    const hoje = new Date().toISOString().split("T")[0];
     
     if (!nome) { alert("⚠️ Informe seu nome."); return false; }
     if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
@@ -439,6 +464,15 @@ function verificarPgto() {
     const btnZap = document.getElementById("btnWhatsapp");
     atualizar();
     
+    if (!lojaAberta) {
+        btnZap.disabled = true;
+        btnZap.innerText = "⚠️ Loja Fechada para Pedidos";
+        document.getElementById("btnGerarPix").style.display = "none";
+        document.getElementById("btnPagarMP").style.display = "none";
+        document.getElementById("btnCopiarValor").style.display = "none";
+        return;
+    }
+
     document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
     document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
     document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
@@ -453,6 +487,10 @@ function verificarPgto() {
 }
 
 function add(n, p) { 
+    if (!lojaAberta) {
+        alert("Olá! No momento estamos aceitando apenas consultas ao cardápio. Nosso horário de pedidos já se encerrou.");
+        return;
+    }
     const itemExistente = carrinho.find(item => item.nome === n);
     if (itemExistente) { itemExistente.qtd = (itemExistente.qtd || 1) + 1; } 
     else { carrinho.push({nome: n, preco: p, qtd: 1}); }
@@ -499,7 +537,6 @@ function abrirMercadoPago() { if (!validarTudo()) return; window.open("https://l
 function finalizarZap() {
     if (!validarTudo()) return;
     const nome = document.getElementById("nome").value;
-    const telefone = document.getElementById("telefone").value;
     const data = document.getElementById('dataAgendamento').value.split('-').reverse().join('/');
     const hora = document.getElementById('horaAgendamento').value;
     const formaPgto = document.getElementById("pagamento").value;
