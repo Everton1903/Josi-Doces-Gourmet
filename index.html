@@ -8,7 +8,7 @@
     
     <style>
         /* Cores: Marrom e Creme */
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fdf5e6; color: #4b3621; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #fdf5e6; color: #4b3621; scroll-behavior: smooth; }
         
         header { 
             background: linear-gradient(135deg, #5d4037, #8d6e63); 
@@ -124,17 +124,17 @@
 
 <div id="bannerPromo" class="banner-promo" onclick="addPromoCombo()">
     <h4>🔥 PROMOÇÃO!</h4>
-    <span> Bolo no Pote + Torta Pequena de Ninho</span>
-    <p>POR R$ 20,00 + FRETE GRÁTIS</p>
+    <span> Clique aqui!!</span>
+    <p>GARANTA FRETE GRÁTIS</p>
 </div>
 
 <div id="modalAviso" class="modal-aviso" style="display: block;">
     <div class="modal-conteudo">
         <h2>⚠️ Horários de Funcionamento</h2>
-        <p>Para que os pedidos sejam feitos, você precisa está dentro desses horários, será possível agendamento para o mesmo dia e datas futuras: Confira!!</p>
+        <p>Confira nossos horários para pedidos e agendamentos:</p>
         <ul style="text-align: left; font-size: 14px; color: #555;">
-            <li>🗓️ <b>Segunda a Sexta:</b><br>Pedidos dás 08h às 12h. Retiradas até as 17h.</li>
-            <li>🚀 <b>Sáb, Dom e Feriados:</b><br>Pedidos dás 08h às 17h.</li>
+            <li>🗓️ <b>Segunda a Sexta:</b><br>Pedidos das 08h às 12h. Retiradas até as 17h.</li>
+            <li>🚀 <b>Sáb, Dom e Feriados:</b><br>Pedidos das 08h às 17h.</li>
             <li>⏰ <b>Atenção:</b> Pedidos para o mesmo dia precisam de 1h de antecedência.</li>
         </ul>
         <a href="https://wa.me/5551985803243?text=Olá Josi! Tenho uma dúvida sobre os horários." target="_blank" class="btn-duvida">💬 Dúvidas no WhatsApp</a>
@@ -255,15 +255,37 @@
 </div>
 
 <script>
-// Variável para controlar a promoção de frete grátis
 let promoAtiva = false;
+let carrinho = [];
+let pixGerado = false;
+let cartaoIniciado = false;
+const CHAVE_PIX = "00431179026"; 
+const NOME_RECEBEDOR = "JOSI DOCES";
+const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
+// FUNÇÃO ATUALIZADA: Força o cliente a ir para o formulário
 function addPromoCombo() {
-    promoAtiva = true; // Ativa o frete grátis
-    add('Combo Promo: Bolo no Pote + Torta Ninho', 20);
+    promoAtiva = true;
+    
+    const jaTemPromo = carrinho.find(item => item.nome === 'FRETE GRÁTIS (Ativado)');
+    if (!jaTemPromo) {
+        carrinho.push({nome: 'FRETE GRÁTIS (Ativado)', preco: 0, qtd: 1, fixo: true});
+    }
+    
     document.getElementById('bannerPromo').style.display = 'none';
-    alert("🔥 Promoção Adicionada! Você ganhou FRETE GRÁTIS neste pedido.");
-    verificarPgto(); // Atualiza o resumo
+    
+    // Abre o carrinho se estiver fechado
+    const box = document.getElementById("carrinhoBox");
+    if (box.style.display === "none" || box.style.display === "") {
+        toggleVisibilidadeCarrinho();
+    }
+
+    // Rola para o formulário e foca no nome
+    document.getElementById("secaoDadosPedido").scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => { document.getElementById("nome").focus(); }, 800);
+
+    verificarPgto();
+    salvarDados();
 }
 
 function abrirCardapioVisual() {
@@ -273,13 +295,6 @@ function abrirCardapioVisual() {
 function fecharCardapioVisual() {
     document.getElementById("modalCardapio").style.display = "none";
 }
-
-let carrinho = [];
-let pixGerado = false;
-let cartaoIniciado = false;
-const CHAVE_PIX = "00431179026"; 
-const NOME_RECEBEDOR = "JOSI DOCES";
-const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
 function toggleVisibilidadeCarrinho() {
     const box = document.getElementById("carrinhoBox");
@@ -345,51 +360,12 @@ function validarTudo() {
     
     const agora = new Date();
     const hoje = agora.toISOString().split("T")[0];
-    const horaAtualStr = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
     
-    const diaSemanaAtual = agora.getDay(); 
-    const feriados = ["01-01", "04-21", "05-01", "09-07", "10-12", "11-02", "11-15", "12-25"];
-    const hojeMMDD = (agora.getMonth() + 1).toString().padStart(2, '0') + "-" + agora.getDate().toString().padStart(2, '0');
-    const isFeriadoHoje = feriados.includes(hojeMMDD);
-
-    if (diaSemanaAtual >= 1 && diaSemanaAtual <= 5 && !isFeriadoHoje) {
-        if (horaAtualStr < "08:00" || horaAtualStr > "12:00") {
-            alert("⚠️ Durante a semana, os pedidos devem ser realizados das 08:00 às 12:00.");
-            return false;
-        }
-    } else {
-        if (horaAtualStr < "08:00" || horaAtualStr > "17:00") {
-            alert("⚠️ Nos finais de semana e feriados, os pedidos devem ser realizados das 08:00 às 17:00.");
-            return false;
-        }
-    }
-
     if (!nome) { alert("⚠️ Informe seu nome."); return false; }
     if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
     if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
-    
-    if (dataInput < hoje) { alert("⚠️ A data de retirada não pode ser no passado."); return false; }
-    
-    if (dataInput === hoje) {
-        const [h, m] = horaInput.split(':');
-        const dataAgendada = new Date();
-        dataAgendada.setHours(h, m, 0, 0);
-        const limiteMinimo = new Date(agora.getTime() + (60 * 60 * 1000)); 
-
-        if (dataAgendada < limiteMinimo) {
-            const hMin = limiteMinimo.getHours().toString().padStart(2, '0');
-            const mMin = limiteMinimo.getMinutes().toString().padStart(2, '0');
-            alert(`⚠️ Para hoje, precisamos de no mínimo 1h de antecedência para preparar seu pedido. Por favor, escolha um horário após as ${hMin}:${mMin}.`);
-            return false;
-        }
-    }
-    
-    if (horaInput < "08:00" || horaInput > "17:00") {
-        alert("⚠️ O horário para retirada/entrega deve ser entre 08:00 e 17:00.");
-        return false;
-    }
-    
-    if (bairro !== "retirada" && !endereco) { alert("⚠️ Informe o endereço para entrega."); return false; }
+    if (dataInput < hoje) { alert("⚠️ A data não pode ser no passado."); return false; }
+    if (bairro !== "retirada" && !endereco) { alert("⚠️ Informe o endereço."); return false; }
     
     return true;
 }
@@ -397,10 +373,8 @@ function validarTudo() {
 function atualizar() {
     const selectBairro = document.getElementById("bairro");
     const valorBairro = selectBairro.value;
-    
     let frete = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
     
-    const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
     const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     const total = subtotal + frete;
     const listaDiv = document.getElementById("itensCarrinhoLista");
@@ -408,12 +382,17 @@ function atualizar() {
     
     carrinho.forEach((item, index) => {
         const precoTotalItem = item.preco * (item.qtd || 1);
-        listaDiv.innerHTML += `<div class="item-carrinho"><span>${item.qtd > 1 ? item.qtd + 'x ' : ''}${item.nome}</span> <span>R$ ${precoTotalItem.toFixed(2).replace('.', ',')} <span class="remover" onclick="remover(${index})">×</span></span></div>`;
+        listaDiv.innerHTML += `<div class="item-carrinho">
+            <span>${item.qtd > 1 ? item.qtd + 'x ' : ''}${item.nome}</span> 
+            <span>R$ ${precoTotalItem.toFixed(2).replace('.', ',')} 
+            <span class="remover" onclick="remover(${index})">×</span></span>
+        </div>`;
     });
 
     if(promoAtiva) {
-        listaDiv.innerHTML += `<div class="item-carrinho item-frete" style="color: green; font-weight: bold;"><span>🚚 FRETE GRÁTIS (PROMO)</span> <span>R$ 0,00</span></div>`;
+        listaDiv.innerHTML += `<div class="item-carrinho item-frete" style="color: green; font-weight: bold;"><span>🚚 FRETE GRÁTIS ATIVADO</span> <span>R$ 0,00</span></div>`;
     } else {
+        const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
         listaDiv.innerHTML += `<div class="item-carrinho item-frete"><span>🚚 ${bairroTexto}</span> <span>R$ ${frete.toFixed(2).replace('.', ',')}</span></div>`;
     }
     
@@ -423,54 +402,11 @@ function atualizar() {
     return total;
 }
 
-function limparCarrinhoCompleto() {
-    if(confirm("Tem certeza que deseja esvaziar o carrinho?")) {
-        carrinho = [];
-        promoAtiva = false; 
-        document.getElementById('bannerPromo').style.display = 'block';
-        salvarDados();
-        resetPagamentoFluxo();
-        if(document.getElementById("carrinhoBox").style.display === "block") toggleVisibilidadeCarrinho();
-    }
-}
-
-function resetPagamentoFluxo() { 
-    pixGerado = false; 
-    cartaoIniciado = false; 
-    document.getElementById("pixDisplay").style.display = "none"; 
-    verificarPgto(); 
-}
-
-function verificarPgto() {
-    const pag = document.getElementById("pagamento").value;
-    const btnZap = document.getElementById("btnWhatsapp");
-    atualizar();
-    
-    // Controla visibilidade dos botões
-    document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
-    document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
-    document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
-    
-    if (pag === "Pix") {
-        btnZap.disabled = !pixGerado;
-        btnZap.innerText = pixGerado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Gere o Pix primeiro";
-    } else {
-        // AJUSTE: Removemos a trava do cartão para permitir que o cliente envie o pedido mesmo que volte ou pague depois
-        btnZap.disabled = false;
-        btnZap.innerText = "✅ Enviar Pedido no WhatsApp";
-    }
-}
-
-function add(n, p) { 
-    const itemExistente = carrinho.find(item => item.nome === n);
-    if (itemExistente) { itemExistente.qtd = (itemExistente.qtd || 1) + 1; } 
-    else { carrinho.push({nome: n, preco: p, qtd: 1}); }
-    salvarDados(); 
-    resetPagamentoFluxo();
-    if(document.getElementById("carrinhoBox").style.display !== "block") toggleVisibilidadeCarrinho();
-}
-
 function remover(index) { 
+    if (carrinho[index].fixo) {
+        alert("Esta promoção garante seu Frete Grátis. Para remover tudo, use 'Esvaziar Carrinho'.");
+        return;
+    }
     if (carrinho[index].qtd > 1) { carrinho[index].qtd -= 1; } 
     else { 
         carrinho.splice(index, 1); 
@@ -481,6 +417,47 @@ function remover(index) {
     }
     salvarDados(); 
     resetPagamentoFluxo(); 
+}
+
+function limparCarrinhoCompleto() {
+    if(confirm("Deseja limpar seu pedido?")) {
+        carrinho = []; promoAtiva = false; 
+        document.getElementById('bannerPromo').style.display = 'block';
+        salvarDados(); resetPagamentoFluxo();
+        if(document.getElementById("carrinhoBox").style.display === "block") toggleVisibilidadeCarrinho();
+    }
+}
+
+function resetPagamentoFluxo() { 
+    pixGerado = false; 
+    document.getElementById("pixDisplay").style.display = "none"; 
+    verificarPgto(); 
+}
+
+function verificarPgto() {
+    const pag = document.getElementById("pagamento").value;
+    const btnZap = document.getElementById("btnWhatsapp");
+    atualizar();
+    
+    document.getElementById("btnGerarPix").style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
+    document.getElementById("btnPagarMP").style.display = (pag !== "Pix") ? "block" : "none";
+    document.getElementById("btnCopiarValor").style.display = (pag !== "Pix") ? "block" : "none";
+    
+    if (pag === "Pix") {
+        btnZap.disabled = !pixGerado;
+        btnZap.innerText = pixGerado ? "✅ Enviar Pedido no WhatsApp" : "⚠️ Gere o Pix primeiro";
+    } else {
+        btnZap.disabled = false;
+        btnZap.innerText = "✅ Enviar Pedido no WhatsApp";
+    }
+}
+
+function add(n, p) { 
+    const itemExistente = carrinho.find(item => item.nome === n);
+    if (itemExistente) { itemExistente.qtd = (itemExistente.qtd || 1) + 1; } 
+    else { carrinho.push({nome: n, preco: p, qtd: 1}); }
+    salvarDados(); resetPagamentoFluxo();
+    if(document.getElementById("carrinhoBox").style.display !== "block") toggleVisibilidadeCarrinho();
 }
 
 function alternarEndereco() { 
@@ -517,7 +494,7 @@ function gerarPixReal() {
     verificarPgto();
 }
 
-function abrirMercadoPago() { if (!validarTudo()) return; cartaoIniciado = true; verificarPgto(); window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank"); }
+function abrirMercadoPago() { if (!validarTudo()) return; window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank"); }
 
 function finalizarZap() {
     if (!validarTudo()) return;
@@ -528,45 +505,23 @@ function finalizarZap() {
     const formaPgto = document.getElementById("pagamento").value;
     const selectBairro = document.getElementById("bairro");
     const valorBairro = selectBairro.value;
-    
     const freteValor = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
     
-    const bairroNome = selectBairro.options[selectBairro.selectedIndex].text;
-    const endereco = document.getElementById("endereco").value;
     let subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
-    let totalGeral = subtotal + freteValor;
-
     let msg = `*🍮 NOVO PEDIDO - JOSI DOCES*\n\n`;
-    msg += `*👤 CLIENTE:* ${nome}\n`;
-    msg += `*📞 CONTATO:* ${telefone}\n`;
-    msg += `*🗓️ DATA DESEJADA:* ${data} às ${hora}\n`;
-    msg += `*💳 PAGAMENTO:* ${formaPgto}\n\n`;
-    
-    msg += `*📍 LOCAL:* ${bairroNome}\n`;
-    if(valorBairro !== "retirada") { 
-        msg += `*🏠 ENDEREÇO:* ${endereco}\n\n`; 
-    } else { 
-        msg += `*🏪 OPÇÃO:* Retirada no local\n\n`; 
-    }
+    msg += `*👤 CLIENTE:* ${nome}\n*🗓️ DATA:* ${data} às ${hora}\n*💳 PGTO:* ${formaPgto}\n\n`;
+    msg += `*📍 LOCAL:* ${selectBairro.options[selectBairro.selectedIndex].text}\n`;
+    if(valorBairro !== "retirada") msg += `*🏠 ENDEREÇO:* ${document.getElementById("endereco").value}\n\n`;
 
-    msg += `*🛒 ITENS DO PEDIDO:*\n`;
+    msg += `*🛒 ITENS:*\n`;
     carrinho.forEach(i => {
-        const precoTotalItem = i.preco * (i.qtd || 1);
-        msg += `- ${i.qtd > 1 ? i.qtd + 'x ' : ''}${i.nome} (R$ ${precoTotalItem.toFixed(2).replace('.', ',')})\n`;
+        if(i.preco > 0) msg += `- ${i.qtd > 1 ? i.qtd + 'x ' : ''}${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`;
     });
     
-    msg += `\n---\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
-    msg += promoAtiva ? `*Taxa:* R$ 0,00 (PROMO FRETE GRÁTIS) ✅\n` : `*Taxa:* R$ ${freteValor.toFixed(2).replace('.', ',')}\n`;
-    msg += `*TOTAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+    msg += `\n*TOTAL:* R$ ${(subtotal + freteValor).toFixed(2).replace('.', ',')}`;
+    if(promoAtiva) msg += `\n*(Frete Grátis Aplicado)* ✅`;
 
     window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
-
-    setTimeout(() => {
-        carrinho = []; promoAtiva = false; salvarDados(); resetPagamentoFluxo();
-        document.getElementById('bannerPromo').style.display = 'block';
-        if(document.getElementById("carrinhoBox").style.display === "block") toggleVisibilidadeCarrinho();
-        alert("✅ Pedido enviado! O carrinho foi limpo.");
-    }, 1000);
 }
 window.onload = carregarDados;
 </script>
