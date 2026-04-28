@@ -29,6 +29,44 @@
         .logo-content .name-gourmet { font-size: 10px; font-weight: bold; color: #8d6e63; display: block; }
         .logo-content .name-contato { font-size: 9px; font-weight: bold; color: #5d4037; display: block; margin-top: 2px; }
 
+        /* Estilo para o Instagram no Header */
+        .insta-header {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #5d4037 !important;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .insta-header img { margin-right: 8px; }
+        .insta-header:hover { transform: scale(1.05); background: #fdf5e6; }
+
+        /* Botão flutuante do Instagram */
+        .insta-float {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .insta-float:hover { transform: rotate(15deg) scale(1.1); }
+
         .container { padding: 20px; max-width: 500px; margin: auto; padding-bottom: 350px; } 
         label { display: block; margin-top: 20px; font-weight: bold; color: #5d4037; font-size: 15px; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: 1px solid #d7ccc8; box-sizing: border-box; background: white; font-size: 16px; }
@@ -123,6 +161,10 @@
 </head>
 <body>
 
+<a href="https://www.instagram.com/josigourmet" target="_blank" class="insta-float" title="Siga nosso Instagram">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="25" alt="Instagram">
+</a>
+
 <div id="bannerPromo" class="banner-promo" onclick="addPromoCombo()">
     <h4>🔥 PROMOÇÃO!</h4>
     <span> Clique aqui!!</span>
@@ -170,6 +212,10 @@
     </div>
     <h1>🍬 Josi Doces Gourmet</h1>
     <p>Escolha suas delícias abaixo!</p>
+    
+    <a href="https://www.instagram.com/josigourmet" target="_blank" class="insta-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="18" alt="Insta"> Siga @josigourmet
+    </a>
 </header>
 
 <div class="container">
