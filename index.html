@@ -61,8 +61,7 @@
             width: 45px;
             height: 45px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; justify-content: center;
             transition: 0.3s;
         }
         .insta-float:hover { transform: rotate(15deg) scale(1.1); }
@@ -306,16 +305,14 @@
 // ==========================================
 function verificarLojaAberta() {
     const agora = new Date();
-    const diaSemana = agora.getDay(); // 0: Dom, 1: Seg, ..., 6: Sab
+    const diaSemana = agora.getDay(); 
     const hora = agora.getHours();
     const minutos = agora.getMinutes();
     const horarioDecimal = hora + (minutos / 60);
 
-    // Segunda a Sexta: 08h às 12h
     if (diaSemana >= 1 && diaSemana <= 5) {
         return (horarioDecimal >= 8 && horarioDecimal < 12);
     } 
-    // Sábado, Domingo e Feriados (assumindo Fim de Semana): 08h às 17h
     else {
         return (horarioDecimal >= 8 && horarioDecimal < 17);
     }
@@ -424,17 +421,41 @@ function validarTudo() {
         alert("⚠️ Não é possível processar o pedido. A loja está fechada.");
         return false;
     }
+
     const nome = document.getElementById("nome").value.trim();
     const telRaw = document.getElementById("telefone").value.replace(/\D/g, "");
     const dataInput = document.getElementById('dataAgendamento').value;
+    const horaInput = document.getElementById('horaAgendamento').value;
     const bairro = document.getElementById("bairro").value;
     const endereco = document.getElementById("endereco").value.trim();
-    const hoje = new Date().toISOString().split("T")[0];
+
+    // Validação de Carrinho Vazio (considerando apenas produtos reais)
+    const produtosReais = carrinho.filter(i => i.preco > 0);
+    if (produtosReais.length === 0) { 
+        alert("⚠️ Seu carrinho está vazio! Escolha algum doce antes de finalizar."); 
+        return false; 
+    }
+
     if (!nome) { alert("⚠️ Informe seu nome."); return false; }
     if (telRaw.length < 10) { alert("⚠️ Informe um WhatsApp válido."); return false; }
-    if (carrinho.length === 0) { alert("⚠️ O carrinho está vazio."); return false; }
-    if (dataInput < hoje) { alert("⚠️ A data não pode ser no passado."); return false; }
-    if (bairro !== "retirada" && !endereco) { alert("⚠️ Informe o endereço."); return false; }
+
+    // Validação de Antecedência (1 hora)
+    const agora = new Date();
+    const selecionado = new Date(dataInput + 'T' + horaInput);
+    const limiteAntecedencia = new Date(agora.getTime() + (60 * 60 * 1000)); // Agora + 1 hora
+
+    if (selecionado < agora) {
+        alert("⚠️ A data ou horário selecionado já passou.");
+        return false;
+    }
+
+    if (selecionado < limiteAntecedencia) {
+        alert("⚠️ Pedidos para o mesmo dia precisam de pelo menos 1 hora de antecedência para preparo.");
+        return false;
+    }
+
+    if (bairro !== "retirada" && !endereco) { alert("⚠️ Informe o endereço para entrega."); return false; }
+    
     return true;
 }
 
