@@ -136,6 +136,14 @@
             display: none; align-items: center; justify-content: center;
             z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 20px; cursor: pointer;
         }
+        
+        /* Contador de produtos no ícone - COR ALTERADA PARA AZUL */
+        .cart-count {
+            position: absolute; top: -5px; right: -5px;
+            background: #007bff; /* Azul (pode usar #009ee3 para combinar com o MP) */
+            color: white; border-radius: 50%;
+            padding: 2px 6px; font-size: 11px; font-weight: bold; border: 2px solid white;
+        }
 
         .item-carrinho { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; font-size: 14px; }
         .item-frete { color: #8d6e63; font-style: italic; border-top: 1px dashed #d7ccc8; margin-top: 5px; }
@@ -273,7 +281,9 @@
     </div>
 </div>
 
-<div id="btnToggle" class="toggle-carrinho" onclick="toggleVisibilidadeCarrinho()">🛒</div>
+<div id="btnToggle" class="toggle-carrinho" onclick="toggleVisibilidadeCarrinho()">
+    <span id="cartIcon">🛒</span>
+</div>
 
 <div id="carrinhoBox">
     <div style="text-align: right;"><span onclick="toggleVisibilidadeCarrinho()" style="cursor:pointer; font-weight:bold; color:#5d4037">FECHAR [X]</span></div>
@@ -355,8 +365,16 @@ function fecharCardapioVisual() {
 function toggleVisibilidadeCarrinho() {
     const box = document.getElementById("carrinhoBox");
     const btn = document.getElementById("btnToggle");
-    box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
-    btn.innerText = box.style.display === "block" ? "X" : "🛒";
+    const isVisible = (box.style.display === "none" || box.style.display === "");
+    
+    box.style.display = isVisible ? "block" : "none";
+    
+    if (isVisible) {
+        btn.innerText = "X";
+    } else {
+        btn.innerHTML = "🛒";
+        atualizar(); // Força a renderização do contador ao fechar
+    }
 }
 
 function mascaraTelefone(i) {
@@ -463,10 +481,17 @@ function atualizar() {
     const selectBairro = document.getElementById("bairro");
     const valorBairro = selectBairro.value;
     let frete = (promoAtiva || valorBairro === "retirada") ? 0 : parseFloat(valorBairro);
-    const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
+    
+    let totalItens = 0;
+    const subtotal = carrinho.reduce((acc, item) => {
+        totalItens += (item.preco > 0 ? item.qtd : 0); // Só conta produtos, não a label de frete
+        return acc + (item.preco * (item.qtd || 1));
+    }, 0);
+    
     const total = subtotal + frete;
     const listaDiv = document.getElementById("itensCarrinhoLista");
     listaDiv.innerHTML = "";
+    
     carrinho.forEach((item, index) => {
         const precoTotalItem = item.preco * (item.qtd || 1);
         listaDiv.innerHTML += `<div class="item-carrinho">
@@ -475,15 +500,28 @@ function atualizar() {
             <span class="remover" onclick="remover(${index})">×</span></span>
         </div>`;
     });
+    
     if(promoAtiva) {
         listaDiv.innerHTML += `<div class="item-carrinho item-frete" style="color: green; font-weight: bold;"><span>🚚 FRETE GRÁTIS ATIVADO</span> <span>R$ 0,00</span></div>`;
     } else {
         const bairroTexto = selectBairro.options[selectBairro.selectedIndex].text.split('(')[0].trim();
         listaDiv.innerHTML += `<div class="item-carrinho item-frete"><span>🚚 ${bairroTexto}</span> <span>R$ ${frete.toFixed(2).replace('.', ',')}</span></div>`;
     }
+    
     document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     document.getElementById("secaoDadosPedido").style.display = carrinho.length > 0 ? "block" : "none";
-    document.getElementById("btnToggle").style.display = carrinho.length > 0 ? "flex" : "none";
+    
+    const btnToggle = document.getElementById("btnToggle");
+    if (carrinho.length > 0) {
+        btnToggle.style.display = "flex";
+        // Atualiza o contador se o carrinho estiver fechado
+        if (document.getElementById("carrinhoBox").style.display !== "block") {
+            btnToggle.innerHTML = `🛒<span class="cart-count">${totalItens}</span>`;
+        }
+    } else {
+        btnToggle.style.display = "none";
+    }
+    
     return total;
 }
 
