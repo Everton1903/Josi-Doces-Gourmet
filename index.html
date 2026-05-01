@@ -268,8 +268,8 @@
 
         <label>⏰ Data e Horário de Recebimento</label>
         <div style="display:flex; gap:5px;">
-            <input type="date" id="dataAgendamento" onchange="resetPagamentoFluxo(); salvarDados(); verificarPgto();">
-            <input type="time" id="horaAgendamento" onchange="resetPagamentoFluxo(); salvarDados(); verificarPgto();">
+            <input type="date" id="dataAgendamento" onchange="validarDataHora(); resetPagamentoFluxo(); salvarDados(); verificarPgto();">
+            <input type="time" id="horaAgendamento" onchange="validarDataHora(); resetPagamentoFluxo(); salvarDados(); verificarPgto();">
         </div>
 
         <label>💳 Forma de Pagamento</label>
@@ -317,24 +317,63 @@ const CHAVE_PIX = "00431179026";
 const NOME_RECEBEDOR = "JOSI DOCES";
 const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
-// --- FUNÇÃO DE CONTROLE DE HORÁRIO AUTOMÁTICO ---
+// --- TRAVA DE DATAS E HORÁRIOS PASSADOS ---
+function configurarLimitesData() {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const dataMinima = `${ano}-${mes}-${dia}`;
+    document.getElementById('dataAgendamento').setAttribute('min', dataMinima);
+}
+
+function validarDataHora() {
+    const dataInput = document.getElementById('dataAgendamento');
+    const horaInput = document.getElementById('horaAgendamento');
+    
+    if (!dataInput.value) return;
+
+    const agora = new Date();
+    const dataSelecionada = new Date(dataInput.value + 'T00:00:00');
+    
+    // Zera horas para comparar apenas datas
+    const hojeApenasData = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+
+    if (dataSelecionada < hojeApenasData) {
+        alert("Ops! Você não pode selecionar uma data que já passou.");
+        dataInput.value = "";
+        horaInput.value = "";
+        return;
+    }
+
+    // Se a data for hoje, verifica se o horário já passou
+    if (dataSelecionada.getTime() === hojeApenasData.getTime() && horaInput.value) {
+        const [horaSel, minSel] = horaInput.value.split(':');
+        const dataHoraSelecionada = new Date();
+        dataHoraSelecionada.setHours(horaSel, minSel, 0, 0);
+
+        if (dataHoraSelecionada < agora) {
+            alert("Este horário já passou! Por favor, escolha um horário futuro.");
+            horaInput.value = "";
+        }
+    }
+}
+
+// --- FUNÇÃO DE CONTROLE DE HORÁRIO AUTOMÁTICO (LOJA ABERTA) ---
 function verificarLojaAberta() {
     const agora = new Date();
     const diaSemana = agora.getDay(); // 0: Dom, 1: Seg... 6: Sab
     const horaAtual = agora.getHours();
     
-    // Lista de feriados 2026 (DD/MM)
     const feriados = ["01/01", "17/02", "03/04", "21/04", "01/05", "04/06", "07/09", "12/10", "02/11", "15/11", "25/12"];
     const hojeFormatado = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
     const ehFeriado = feriados.includes(hojeFormatado);
 
     let aberta = false;
 
-    // Lógica: Seg a Sex (Exceto feriados) -> 08h às 12h
     if (diaSemana >= 1 && diaSemana <= 5 && !ehFeriado) {
         if (horaAtual >= 8 && horaAtual < 12) aberta = true;
     } else {
-        // Sábado, Domingo ou Feriado -> 08h às 17h
         if (horaAtual >= 8 && horaAtual < 17) aberta = true;
     }
     return aberta;
@@ -369,6 +408,7 @@ function salvarDados() {
 }
 
 function carregarDados() {
+    configurarLimitesData(); // Configura o min date ao carregar
     const salvo = localStorage.getItem('pedidoJosiDoces');
     if (salvo) {
         const d = JSON.parse(salvo);
@@ -382,6 +422,7 @@ function carregarDados() {
         document.getElementById('dataAgendamento').value = d.data || "";
         document.getElementById('horaAgendamento').value = d.hora || "";
         alternarEndereco();
+        validarDataHora(); // Revalida caso os dados salvos sejam antigos
         verificarPgto();
     }
 }
@@ -400,7 +441,6 @@ function atualizar() {
     });
     document.getElementById("resumo").innerHTML = `<b>TOTAL: R$ ${total.toFixed(2).replace('.', ',')}</b>`;
     
-    // BLOQUEIO SEÇÃO DADOS SE FECHADO
     const aberta = verificarLojaAberta();
     document.getElementById("secaoDadosPedido").style.display = (carrinho.length > 0 && aberta) ? "block" : "none";
     
@@ -455,7 +495,6 @@ function verificarPgto() {
 
     document.getElementById("erroTelefone").style.display = (telRaw.length > 0 && !telValido) ? "block" : "none";
 
-    // Se estiver fechada, altera o botão de WhatsApp e esconde botões de pagamento
     if (!aberta) {
         btnPix.style.display = "none";
         btnMP.style.display = "none";
