@@ -65,6 +65,13 @@
 
         .card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #d7ccc8; }
         .price { color: #8d6e63; font-weight: bold; font-size: 1.3em; margin: 10px 0; }
+        
+        /* Ajuste de botões mais e menos */
+        .controles-quantidade { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px; }
+        .btn-menor { background: #e74c3c !important; width: 40px !important; }
+        .btn-maior { background: #25D366 !important; width: 40px !important; }
+        .qtd-display { font-weight: bold; font-size: 18px; min-width: 20px; }
+        
         button { color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; font-size: 16px; }
         
         .btn-add { background: #25D366; } 
@@ -133,13 +140,13 @@
 
         .toggle-carrinho {
             position: fixed; bottom: 20px; left: 10px; width: 45px; height: 45px;
-            background: #5d4037; color: white; border-radius: 50%;
-            display: none; align-items: center; justify-content: center;
+            background: #007bff; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
             z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 20px; cursor: pointer;
         }
         .cart-badge {
             position: absolute; top: -5px; right: -5px;
-            background: #007bff; color: white; border-radius: 50%;
+            background: #e74c3c; color: white; border-radius: 50%;
             padding: 2px 6px; font-size: 12px; font-weight: bold; border: 2px solid white;
         }
         
@@ -232,15 +239,77 @@
         <a href="https://wa.me/5551985803243?text=Olá Josi! Gostaria de um orçamento para evento." target="_blank" class="btn-evento">Solicitar Orçamento</a>
     </div>
 
-    <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p><button class="btn-add" onclick="add('Torta de Bolacha (1Kg)', 55)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Torta de Bolacha Pequena (250g)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Bolacha Pequena', 10)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Torta de Bolacha Grande (300g)</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Torta de Bolacha Grande', 12)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Torta de Ninho Pequena (250g)</h3><p class="price">R$ 10,00</p><button class="btn-add" onclick="add('Torta de Ninho Pequena', 10)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Bolo de Chocolate no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Chocolate no Pote', 12)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Bolo de Brigadeiro no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Brigadeiro no Pote', 12)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Bolo no Pote com Pudim</h3><p class="price">R$ 14,00</p><button class="btn-add" onclick="add('Bolo no Pote com Pudim', 14)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Bolo de Stikadinho no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Stikadinho no Pote', 12)">Adicionar ao Carrinho</button></div>
-    <div class="card"><h3>Bolo de Cenoura no Pote</h3><p class="price">R$ 12,00</p><button class="btn-add" onclick="add('Bolo de Cenoura no Pote', 12)">Adicionar ao Carrinho</button></div>
+    <div class="card"><h3>Torta de Bolacha (1kg)</h3><p class="price">R$ 55,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Torta de Bolacha (1Kg)')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Torta de Bolacha (1Kg)">0</span>
+            <button class="btn-maior" onclick="add('Torta de Bolacha (1Kg)', 55)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Torta de Bolacha Pequena (250g)</h3><p class="price">R$ 10,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Torta de Bolacha Pequena')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Torta de Bolacha Pequena">0</span>
+            <button class="btn-maior" onclick="add('Torta de Bolacha Pequena', 10)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Torta de Bolacha Grande (300g)</h3><p class="price">R$ 12,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Torta de Bolacha Grande')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Torta de Bolacha Grande">0</span>
+            <button class="btn-maior" onclick="add('Torta de Bolacha Grande', 12)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Torta de Ninho Pequena (250g)</h3><p class="price">R$ 10,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Torta de Ninho Pequena')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Torta de Ninho Pequena">0</span>
+            <button class="btn-maior" onclick="add('Torta de Ninho Pequena', 10)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Bolo de Chocolate no Pote</h3><p class="price">R$ 12,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Bolo de Chocolate no Pote')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Bolo de Chocolate no Pote">0</span>
+            <button class="btn-maior" onclick="add('Bolo de Chocolate no Pote', 12)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Bolo de Brigadeiro no Pote</h3><p class="price">R$ 12,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Bolo de Brigadeiro no Pote')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Bolo de Brigadeiro no Pote">0</span>
+            <button class="btn-maior" onclick="add('Bolo de Brigadeiro no Pote', 12)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Bolo no Pote com Pudim</h3><p class="price">R$ 14,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Bolo no Pote com Pudim')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Bolo no Pote com Pudim">0</span>
+            <button class="btn-maior" onclick="add('Bolo no Pote com Pudim', 14)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Bolo de Stikadinho no Pote</h3><p class="price">R$ 12,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Bolo de Stikadinho no Pote')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Bolo de Stikadinho no Pote">0</span>
+            <button class="btn-maior" onclick="add('Bolo de Stikadinho no Pote', 12)">+</button>
+        </div>
+    </div>
+
+    <div class="card"><h3>Bolo de Cenoura no Pote</h3><p class="price">R$ 12,00</p>
+        <div class="controles-quantidade">
+            <button class="btn-menor" onclick="removerPorNome('Bolo de Cenoura no Pote')">-</button>
+            <span class="adicionar-texto">Adicionar</span> <span class="qtd-display" id="qtd-Bolo de Cenoura no Pote">0</span>
+            <button class="btn-maior" onclick="add('Bolo de Cenoura no Pote', 12)">+</button>
+        </div>
+    </div>
 
     <div id="secaoDadosPedido">
         <label>👤 Seus Dados</label>
@@ -317,7 +386,6 @@ const CHAVE_PIX = "00431179026";
 const NOME_RECEBEDOR = "JOSI DOCES";
 const CIDADE_RECEBEDOR = "VENANCIO AIRES";
 
-// --- TRAVA DE DATAS E HORÁRIOS PASSADOS ---
 function configurarLimitesData() {
     const hoje = new Date();
     const ano = hoje.getFullYear();
@@ -330,28 +398,18 @@ function configurarLimitesData() {
 function validarDataHora() {
     const dataInput = document.getElementById('dataAgendamento');
     const horaInput = document.getElementById('horaAgendamento');
-    
     if (!dataInput.value) return;
-
     const agora = new Date();
     const dataSelecionada = new Date(dataInput.value + 'T00:00:00');
-    
-    // Zera horas para comparar apenas datas
     const hojeApenasData = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-
     if (dataSelecionada < hojeApenasData) {
         alert("Ops! Você não pode selecionar uma data que já passou.");
-        dataInput.value = "";
-        horaInput.value = "";
-        return;
+        dataInput.value = ""; horaInput.value = ""; return;
     }
-
-    // Se a data for hoje, verifica se o horário já passou
     if (dataSelecionada.getTime() === hojeApenasData.getTime() && horaInput.value) {
         const [horaSel, minSel] = horaInput.value.split(':');
         const dataHoraSelecionada = new Date();
         dataHoraSelecionada.setHours(horaSel, minSel, 0, 0);
-
         if (dataHoraSelecionada < agora) {
             alert("Este horário já passou! Por favor, escolha um horário futuro.");
             horaInput.value = "";
@@ -359,18 +417,14 @@ function validarDataHora() {
     }
 }
 
-// --- FUNÇÃO DE CONTROLE DE HORÁRIO AUTOMÁTICO (LOJA ABERTA) ---
 function verificarLojaAberta() {
     const agora = new Date();
-    const diaSemana = agora.getDay(); // 0: Dom, 1: Seg... 6: Sab
+    const diaSemana = agora.getDay();
     const horaAtual = agora.getHours();
-    
     const feriados = ["01/01", "17/02", "03/04", "21/04", "01/05", "04/06", "07/09", "12/10", "02/11", "15/11", "25/12"];
     const hojeFormatado = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
     const ehFeriado = feriados.includes(hojeFormatado);
-
     let aberta = false;
-
     if (diaSemana >= 1 && diaSemana <= 5 && !ehFeriado) {
         if (horaAtual >= 8 && horaAtual < 12) aberta = true;
     } else {
@@ -408,7 +462,7 @@ function salvarDados() {
 }
 
 function carregarDados() {
-    configurarLimitesData(); // Configura o min date ao carregar
+    configurarLimitesData();
     const salvo = localStorage.getItem('pedidoJosiDoces');
     if (salvo) {
         const d = JSON.parse(salvo);
@@ -422,7 +476,7 @@ function carregarDados() {
         document.getElementById('dataAgendamento').value = d.data || "";
         document.getElementById('horaAgendamento').value = d.hora || "";
         alternarEndereco();
-        validarDataHora(); // Revalida caso os dados salvos sejam antigos
+        validarDataHora();
         verificarPgto();
     }
 }
@@ -433,7 +487,24 @@ function atualizar() {
     let subtotal = carrinho.reduce((acc, item) => acc + (item.preco * (item.qtd || 1)), 0);
     const total = subtotal + frete;
     const qtdTotal = carrinho.reduce((acc, item) => acc + (item.nome !== 'FRETE GRÁTIS (Ativado)' ? item.qtd : 0), 0);
+    
     document.getElementById("cartBadge").innerText = qtdTotal;
+    
+    // ATUALIZAÇÃO DE COR SOLICITADA: Verde se tiver pedido, azul se não.
+    const btnToggle = document.getElementById("btnToggle");
+    if (qtdTotal > 0) {
+        btnToggle.style.background = "#25D366"; // Verde
+    } else {
+        btnToggle.style.background = "#007bff"; // Azul
+    }
+
+    const todosDisplays = document.querySelectorAll('.qtd-display');
+    todosDisplays.forEach(span => span.innerText = "0");
+    carrinho.forEach(item => {
+        const span = document.getElementById(`qtd-${item.nome}`);
+        if(span) span.innerText = item.qtd;
+    });
+
     const listaDiv = document.getElementById("itensCarrinhoLista");
     listaDiv.innerHTML = "";
     carrinho.forEach((item, index) => {
@@ -443,9 +514,13 @@ function atualizar() {
     
     const aberta = verificarLojaAberta();
     document.getElementById("secaoDadosPedido").style.display = (carrinho.length > 0 && aberta) ? "block" : "none";
-    
     document.getElementById("btnToggle").style.display = "flex";
     return total;
+}
+
+function removerPorNome(nome) {
+    const index = carrinho.findIndex(i => i.nome === nome);
+    if (index !== -1) remover(index);
 }
 
 function remover(index) {
@@ -478,7 +553,6 @@ function verificarPgto() {
     const btnZap = document.getElementById("btnWhatsapp");
     const btnPix = document.getElementById("btnGerarPix");
     const btnMP = document.getElementById("btnPagarMP");
-    
     const nome = document.getElementById("nome").value.trim();
     const telRaw = document.getElementById("telefone").value.replace(/\D/g, "");
     const data = document.getElementById("dataAgendamento").value;
@@ -488,41 +562,29 @@ function verificarPgto() {
 
     atualizar();
     const aberta = verificarLojaAberta();
-
     let telValido = false;
     if (telRaw.length === 11 && telRaw[2] === "9") telValido = true;
     else if (telRaw.length === 9 && telRaw[0] === "9") telValido = true;
-
     document.getElementById("erroTelefone").style.display = (telRaw.length > 0 && !telValido) ? "block" : "none";
 
     if (!aberta) {
-        btnPix.style.display = "none";
-        btnMP.style.display = "none";
-        btnZap.disabled = true;
-        btnZap.style.background = "#e74c3c";
-        btnZap.innerText = "🔴 LOJA FECHADA AGORA";
+        btnPix.style.display = "none"; btnMP.style.display = "none";
+        btnZap.disabled = true; btnZap.style.background = "#e74c3c"; btnZap.innerText = "🔴 LOJA FECHADA AGORA";
         return;
     }
 
     const basicoOk = (nome !== "" && telValido && data !== "" && hora !== "");
     const entregaOk = (bairro === "retirada" || (bairro !== "retirada" && endereco !== ""));
     const tudoPronto = (basicoOk && entregaOk);
-
     btnPix.style.display = (pag === "Pix" && !pixGerado) ? "block" : "none";
     btnMP.style.display = (pag.includes("Cartão")) ? "block" : "none";
-    
-    btnPix.disabled = !tudoPronto;
-    btnMP.disabled = !tudoPronto;
-
+    btnPix.disabled = !tudoPronto; btnMP.disabled = !tudoPronto;
     const pixObrigatorioOk = (pag === "Pix" ? pixGerado : true);
 
     if (tudoPronto && pixObrigatorioOk) {
-        btnZap.disabled = false;
-        btnZap.innerText = "✅ Enviar no WhatsApp";
-        btnZap.style.background = "#25D366";
+        btnZap.disabled = false; btnZap.innerText = "✅ Enviar no WhatsApp"; btnZap.style.background = "#25D366";
     } else {
-        btnZap.disabled = true;
-        btnZap.style.background = "#ccc";
+        btnZap.disabled = true; btnZap.style.background = "#ccc";
         if (!basicoOk) btnZap.innerText = "⚠️ Nome/Tel(9)/Data incompletos";
         else if (!entregaOk) btnZap.innerText = "📍 Preencha o Endereço";
         else if (!pixObrigatorioOk) btnZap.innerText = "💎 Gere o Pix primeiro";
@@ -533,7 +595,6 @@ function add(n, p) {
     const item = carrinho.find(i => i.nome === n);
     if (item) item.qtd += 1; else carrinho.push({nome: n, preco: p, qtd: 1});
     salvarDados(); resetPagamentoFluxo(); verificarPgto();
-    if(document.getElementById("carrinhoBox").style.display !== "block") toggleVisibilidadeCarrinho();
 }
 
 function addPromoCombo() {
@@ -543,7 +604,6 @@ function addPromoCombo() {
     const itemExistente = carrinho.find(i => i.nome === nomeCombo);
     if (itemExistente) itemExistente.qtd += 1;
     else carrinho.push({nome: nomeCombo, preco: precoCombo, qtd: 1});
-
     if (!carrinho.find(i => i.nome === 'FRETE GRÁTIS (Ativado)')) {
         carrinho.push({nome: 'FRETE GRÁTIS (Ativado)', preco: 0, qtd: 1, fixo: true});
     }
@@ -588,21 +648,18 @@ function finalizarZap() {
     const bairroTexto = bairroSel.options[bairroSel.selectedIndex].text;
     const endereco = document.getElementById("endereco").value;
     const total = atualizar().toFixed(2).replace('.', ',');
-
     let itensTexto = "";
     carrinho.forEach(i => { itensTexto += `▪️ ${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2).replace('.', ',')}\n`; });
-
     let localTexto = `🚚 *ENTREGA:* ${bairroTexto}`;
     if (bairroSel.value === "retirada") localTexto = `🏠 *RETIRADA:* O cliente irá retirar no local.`;
     else localTexto += `\n📍 *ENDEREÇO:* ${endereco}`;
-
     const msg = `*🍮 NOVO PEDIDO - JOSI DOCES*\n\n👤 *CLIENTE:* ${nome}\n📱 *WHATSAPP:* ${tel}\n\n🛒 *--- PRODUTOS ---*\n${itensTexto}\n${localTexto}\n\n📅 *DATA:* ${data}\n⏰ *HORÁRIO:* ${hora}\n\n💳 *PAGAMENTO:* ${pag}\n💰 *TOTAL DO PEDIDO: R$ ${total}*\n\n_Pedido enviado via Catálogo Digital_`;
     window.open(`https://wa.me/5551985803243?text=${encodeURIComponent(msg)}`);
 }
 
 function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("Pix Copiado!"); }
 function abrirMercadoPago() { window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank"); }
-function limparCarrinhoCompleto() { if(confirm("Limpar pedido?")) { carrinho = []; promoAtiva = false; salvarDados(); resetPagamentoFluxo(); toggleVisibilidadeCarrinho(); } }
+function limparCarrinhoCompleto() { if(confirm("Limpar pedido?")) { carrinho = []; promoAtiva = false; salvarDados(); resetPagamentoFluxo(); atualizar(); } }
 
 window.onload = carregarDados;
 </script>
