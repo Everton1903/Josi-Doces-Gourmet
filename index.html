@@ -159,12 +159,17 @@
             scroll-snap-type: x mandatory; scrollbar-width: none;
         }
         .galeria-inicial::-webkit-scrollbar { display: none; }
+        
+        /* AJUSTE SOLICITADO: Tamanho padronizado das imagens */
         .galeria-inicial img {
-            width: 320px;
-            height: auto;
-            border-radius: 15px; scroll-snap-align: center;
+            width: 300px;
+            height: 300px; /* Define altura fixa */
+            object-fit: cover; /* Faz a imagem preencher o quadrado sem deformar */
+            border-radius: 15px; 
+            scroll-snap-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid #d7ccc8;
         }
+        
         .instrucao-slide { font-size: 12px; color: #8d6e63; margin-bottom: 10px; }
         
         .erro-tel { color: red; font-size: 11px; font-weight: bold; display: none; margin-top: 5px; }
@@ -198,6 +203,7 @@
             <img src="https://i.postimg.cc/34LJvHqZ/20260420-120716.jpg">
             <img src="https://i.postimg.cc/T5p2j48b/IMG-20260418-WA0008.jpg">
             <img src="https://i.postimg.cc/WF9bkPyX/IMG-20260418-WA0010.jpg">
+            <img src="https://i.postimg.cc/28M6M4QK/1777779837866.png">
         </div>
         <button class="btn-entendi" onclick="fecharGaleriaAbrirHorarios()">Ver Cardápio e Preços</button>
     </div>
@@ -490,7 +496,6 @@ function atualizar() {
     
     document.getElementById("cartBadge").innerText = qtdTotal;
     
-    // ATUALIZAÇÃO DE COR SOLICITADA: Verde se tiver pedido, azul se não.
     const btnToggle = document.getElementById("btnToggle");
     if (qtdTotal > 0) {
         btnToggle.style.background = "#25D366"; // Verde
