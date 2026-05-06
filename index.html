@@ -66,7 +66,6 @@
         .card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #d7ccc8; }
         .price { color: #8d6e63; font-weight: bold; font-size: 1.3em; margin: 10px 0; }
         
-        /* Ajuste de botões mais e menos */
         .controles-quantidade { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px; }
         .btn-menor { background: #e74c3c !important; width: 40px !important; }
         .btn-maior { background: #25D366 !important; width: 40px !important; }
@@ -103,7 +102,6 @@
         .btn-entendi { background: #5d4037; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
         .btn-duvida { background: #25D366; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; text-decoration: none; display: block; box-sizing: border-box; margin-bottom: 10px; }
 
-        /* BANNER EM TELA CHEIA */
         #modalPromo { display: none; }
         .promo-fullscreen-content {
             background: #fff; margin: 5% auto; padding: 12px;
@@ -122,7 +120,6 @@
         .btn-promo-add { background: #25D366; color: white; font-size: 16px; padding: 12px; border-radius: 12px; border: none; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 8px; }
         .btn-promo-close { background: #fdf5e6; color: #5d4037; font-size: 13px; padding: 8px; border-radius: 10px; border: 1px solid #d7ccc8; cursor: pointer; width: 100%; }
 
-        /* BOTÃO FIXO PARA REABRIR PROMO */
         .reabrir-promo {
             position: fixed; top: 80px; left: 10px; z-index: 998;
             background: #e67e22; color: white; padding: 8px 12px;
@@ -160,11 +157,10 @@
         }
         .galeria-inicial::-webkit-scrollbar { display: none; }
         
-        /* AJUSTE SOLICITADO: Tamanho padronizado das imagens */
         .galeria-inicial img {
             width: 300px;
-            height: 300px; /* Define altura fixa */
-            object-fit: cover; /* Faz a imagem preencher o quadrado sem deformar */
+            height: 300px; 
+            object-fit: cover; 
             border-radius: 15px; 
             scroll-snap-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 2px solid #d7ccc8;
@@ -498,9 +494,9 @@ function atualizar() {
     
     const btnToggle = document.getElementById("btnToggle");
     if (qtdTotal > 0) {
-        btnToggle.style.background = "#25D366"; // Verde
+        btnToggle.style.background = "#25D366";
     } else {
-        btnToggle.style.background = "#007bff"; // Azul
+        btnToggle.style.background = "#007bff";
     }
 
     const todosDisplays = document.querySelectorAll('.qtd-display');
@@ -664,7 +660,25 @@ function finalizarZap() {
 
 function copiarPix() { const t = document.getElementById("brcode"); t.select(); navigator.clipboard.writeText(t.value); alert("Pix Copiado!"); }
 function abrirMercadoPago() { window.open("https://link.mercadopago.com.br/josidocesgoumert", "_blank"); }
-function limparCarrinhoCompleto() { if(confirm("Limpar pedido?")) { carrinho = []; promoAtiva = false; salvarDados(); resetPagamentoFluxo(); atualizar(); } }
+
+// FUNÇÃO AJUSTADA: Agora limpa bairro e endereço ao esvaziar o carrinho
+function limparCarrinhoCompleto() { 
+    if(confirm("Limpar pedido?")) { 
+        carrinho = []; 
+        promoAtiva = false; 
+        
+        // Reseta os campos de endereço
+        document.getElementById("bairro").value = "retirada";
+        document.getElementById("endereco").value = "";
+        
+        // Esconde a caixa de endereço visualmente
+        alternarEndereco();
+        
+        salvarDados(); 
+        resetPagamentoFluxo(); 
+        atualizar(); 
+    } 
+}
 
 window.onload = carregarDados;
 </script>
